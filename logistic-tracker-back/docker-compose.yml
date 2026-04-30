@@ -1,0 +1,80 @@
+version: "3.9"
+
+networks:
+  smartship-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:
+
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: smartship-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: smartship
+      POSTGRES_USER: smartship
+      POSTGRES_PASSWORD: smartship123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - smartship-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartship -d smartship"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── pgAdmin ──────────────────────────────────────────────────────────────────
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: smartship-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@smartship.io
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - smartship-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ── Backend ──────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartship-backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/smartship
+      DB_USER: smartship
+      DB_PASSWORD: smartship123
+      JWT_SECRET: c21hcnRzaGlwLXN1cGVyLXNlY3JldC1rZXktdGhhdC1pcy1sb25nLWVub3VnaC0yNTY=
+      JWT_EXPIRATION_MS: "86400000"
+      SERVER_PORT: "8080"
+    ports:
+      - "8080:8080"
+    networks:
+      - smartship-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
