@@ -1,0 +1,39 @@
+<div class="board-columns">
+  @for (status of statuses(); track status) {
+    <div class="column">
+      <div class="column-header">
+        <span class="column-title">{{ status.replace('_', ' ') }}</span>
+        <span class="column-count">{{ packagesByStatus()[status].length }}</span>
+      </div>
+
+      <div
+        class="column-body"
+        cdkDropList
+        [id]="status"
+        [cdkDropListData]="packagesByStatus()[status]"
+        [cdkDropListConnectedTo]="connectedDropLists()"
+        [cdkDropListEnterPredicate]="canEnterDropList()"
+        (cdkDropListDropped)="dropToStatus.emit({ event: $event, status })"
+        [class.cdk-drop-list-dragging]="isDragging()"
+      >
+        @for (pkg of packagesByStatus()[status]; track pkg.id) {
+          <div
+            cdkDrag
+            [cdkDragData]="pkg"
+            [cdkDragDisabled]="!draggable()"
+            (cdkDragStarted)="isDragging.set(true)"
+            (cdkDragEnded)="isDragging.set(false)"
+            class="drag-item"
+          >
+            <app-package-card [pkg]="pkg" [draggable]="draggable()" />
+            <div *cdkDragPlaceholder class="drag-placeholder"></div>
+          </div>
+        }
+
+        @if (!(packagesByStatus()[status]?.length)) {
+          <div class="empty-column">Drop packages here</div>
+        }
+      </div>
+    </div>
+  }
+</div>

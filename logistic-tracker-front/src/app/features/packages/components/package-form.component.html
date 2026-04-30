@@ -1,0 +1,80 @@
+<div class="form-card">
+  <h2 class="form-title">Register New Package</h2>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="package-form">
+    <div class="fields-grid">
+      <div class="field">
+        <label for="trackingId">Tracking ID</label>
+        <input
+          id="trackingId"
+          type="text"
+          formControlName="trackingId"
+          placeholder="e.g. TRK-001"
+          [class.invalid]="isInvalid('trackingId')"
+        />
+        @if (isInvalid('trackingId')) {
+          <span class="field-error">Tracking ID is required</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="weight">Weight (kg)</label>
+        <input
+          id="weight"
+          type="number"
+          formControlName="weight"
+          placeholder="e.g. 2.5"
+          [class.invalid]="isInvalid('weight')"
+        />
+        @if (isInvalid('weight')) {
+          <span class="field-error">Weight must be greater than 0</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="dimensions">Dimensions</label>
+        <input
+          id="dimensions"
+          type="text"
+          formControlName="dimensions"
+          placeholder="e.g. 30x20x15 cm"
+          [class.invalid]="isInvalid('dimensions')"
+        />
+        @if (isInvalid('dimensions')) {
+          <span class="field-error">Dimensions are required</span>
+        }
+      </div>
+
+      <div class="field">
+        <label for="recipientId">Recipient</label>
+        <select id="recipientId" formControlName="recipientId" [class.invalid]="isInvalid('recipientId')">
+          <option value="">Select recipient</option>
+          @for (recipient of recipients(); track recipient.id) {
+            <option [value]="recipient.id">{{ recipient.name }} - {{ recipient.documentNumber }}</option>
+          }
+        </select>
+        <button type="button" class="btn-link" (click)="loadRecipients()">Refresh recipients</button>
+        @if (isInvalid('recipientId')) {
+          <span class="field-error">Recipient is required</span>
+        }
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="error-banner">{{ error() }}</div>
+    }
+    @if (success()) {
+      <div class="success-banner">Package registered successfully!</div>
+    }
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="loading()" class="btn-primary">
+        @if (loading()) {
+          Saving...
+        } @else {
+          Register Package
+        }
+      </button>
+    </div>
+  </form>
+</div>

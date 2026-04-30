@@ -8,12 +8,14 @@ Built with Java 21, Spring Boot 3.x, PostgreSQL, Docker, and JWT Authentication.
 ## Table of Contents
 
 1. [Architecture](#architecture)
-2. [Setup & Running](#setup--running)
-3. [Environment Variables](#environment-variables)
-4. [API Documentation](#api-documentation)
-5. [Database Design](#database-design)
-6. [Database Justification (PostgreSQL vs NoSQL)](#database-justification)
-7. [AI Skill Log](#ai-skill-log)
+2. [What's New](#whats-new)
+3. [Setup & Running](#setup--running)
+4. [Environment Variables](#environment-variables)
+5. [API Documentation](#api-documentation)
+6. [Database Design](#database-design)
+7. [Database Justification (PostgreSQL vs NoSQL)](#database-justification)
+8. [Prompt Log & Senior Criterion](#prompt-log--senior-criterion)
+9. [AI Skill Log](#ai-skill-log)
 
 ---
 
@@ -23,31 +25,28 @@ Built with Java 21, Spring Boot 3.x, PostgreSQL, Docker, and JWT Authentication.
 
 ```
 src/main/java/com/vcsoft/logistic_tracker_back/
-├── controller/            # HTTP adapters (REST controllers)
+├── adapter/
+│   ├── controller/         # HTTP adapters (REST controllers)
+│   ├── mapper/             # Domain -> Response DTO mappers
+│   └── exception/          # API-level exception handling
 ├── application/
-│   ├── port/
-│   │   ├── input/         # Use-case interfaces (inbound ports)
-│   │   └── output/        # Repository interfaces (outbound ports)
-│   └── usecase/           # Application services (use-case implementations)
+│   ├── dto/
+│   │   ├── request/        # Inbound request DTOs with JSR-303 validation
+│   │   └── response/       # Outbound response DTOs
+│   └── usecase/            # Application services by feature (auth/drivers/packages/recipients)
 ├── domain/
-│   ├── model/             # Aggregate roots and enums (framework-free)
-│   ├── state/             # State Pattern: PackageState, concrete states, factory
-│   └── exception/         # Domain exceptions (no Spring dependency)
+│   ├── model/              # Aggregate roots and enums (framework-free)
+│   ├── state/              # State Pattern: PackageState, concrete states, factory
+│   ├── exception/          # Domain exceptions (no Spring dependency)
+│   └── port/out/           # Outbound ports (repository contracts)
 ├── infrastructure/
+│   ├── security/           # SecurityFilterChain, JWT filter, UserDetailsService, JWT util
+│   ├── config/             # OpenAPI config, bootstrap runners
 │   └── persistence/
-│       ├── entity/        # JPA entities
-│       ├── repository/    # Spring Data JPA repositories
-│       ├── mapper/        # Entity ↔ Domain mappers
-│       └── adapter/       # Output port implementations
-├── security/
-│   ├── config/            # SecurityFilterChain, AuthenticationProvider
-│   ├── filter/            # JwtAuthenticationFilter
-│   ├── service/           # UserDetailsService
-│   └── util/              # JwtUtil (sign / validate)
-├── dto/
-│   ├── request/           # Inbound request DTOs with JSR-303 validation
-│   └── response/          # Outbound response DTOs + mappers
-└── exception/             # GlobalExceptionHandler (@RestControllerAdvice)
+│       ├── entity/         # JPA entities
+│       ├── repository/     # Spring Data JPA repositories
+│       ├── mapper/         # Entity <-> Domain mappers
+│       └── adapter/        # Outbound port implementations
 ```
 
 ### Design Principles
@@ -76,6 +75,40 @@ Adding a new state (`RETURNED`) requires:
 2. Add `RETURNED` to `PackageStatus` enum
 3. Register in `PackageStateFactory`
 4. Add Flyway migration — zero changes to existing business logic.
+
+---
+
+## What's New
+
+### 1) Admin Management Features
+
+- **Driver administration endpoints** added under `/api/v1/admin/drivers`:
+  - `POST /api/v1/admin/drivers`
+  - `GET /api/v1/admin/drivers`
+  - `DELETE /api/v1/admin/drivers/{driverId}`
+- **Recipient administration endpoints** added under `/api/v1/admin/recipients`:
+  - `POST /api/v1/admin/recipients`
+  - `GET /api/v1/admin/recipients`
+  - `PUT /api/v1/admin/recipients/{recipientId}`
+  - `DELETE /api/v1/admin/recipients/{recipientId}`
+
+### 2) Database Integrity Hardening (Flyway V4)
+
+`V4__add_package_status_transition_trigger_and_constraints.sql` introduces stronger DB-level guardrails:
+
+- **Status/role constraints** using CHECK constraints
+- **Non-blank constraints** for key text fields (`tracking_id`, recipient identity/contact fields, user credentials)
+- **Timestamp consistency constraints** (`updated_at >= created_at`)
+- **Trigger-based transition validation** for package status updates:
+  - Allowed only: `RECEIVED -> IN_TRANSIT -> DELIVERED`
+  - Forbidden transitions fail with SQL state `23514`
+
+This complements domain-level validation with a second safety layer in persistence.
+
+### 3) Stronger API Boundary Enforcement
+
+- Dedicated response mappers (`PackageResponseMapper`, `DriverResponseMapper`, `RecipientResponseMapper`) ensure controllers return DTOs only.
+- This prevents JPA/entity leakage to API clients and keeps contracts stable as persistence evolves.
 
 ---
 
@@ -189,7 +222,7 @@ Creates a new package in `RECEIVED` status.
   "trackingId": "TRK-2024-001",
   "weight": 2.5,
   "dimensions": "30x20x10cm",
-  "recipientName": "John Doe"
+  "recipientId": "11111111-2222-3333-4444-555555555555"
 }
 
 // Response 201
@@ -198,6 +231,7 @@ Creates a new package in `RECEIVED` status.
   "trackingId": "TRK-2024-001",
   "weight": 2.5,
   "dimensions": "30x20x10cm",
+  "recipientId": "11111111-2222-3333-4444-555555555555",
   "recipientName": "John Doe",
   "status": "RECEIVED",
   "createdAt": "...",
@@ -209,7 +243,7 @@ Creates a new package in `RECEIVED` status.
 - `trackingId`: required, max 100 chars, must be unique
 - `weight`: must be > 0
 - `dimensions`: required
-- `recipientName`: required
+- `recipientId`: required, must be a valid UUID
 
 ---
 
@@ -260,6 +294,50 @@ RECEIVED → IN_TRANSIT → DELIVERED
 - `RECEIVED → DELIVERED`
 - Any reverse transition
 - Any transition from `DELIVERED`
+
+---
+
+### Driver Administration (ADMIN only)
+
+#### POST /api/v1/admin/drivers
+
+Creates a new driver account.
+
+```json
+// Request
+{
+  "username": "driver02",
+  "password": "StrongPass!123"
+}
+```
+
+#### GET /api/v1/admin/drivers
+
+Returns all registered drivers.
+
+#### DELETE /api/v1/admin/drivers/{driverId}
+
+Deletes an existing driver.
+
+---
+
+### Recipient Administration (ADMIN only)
+
+#### POST /api/v1/admin/recipients
+
+Creates a recipient.
+
+#### GET /api/v1/admin/recipients
+
+Lists recipients.
+
+#### PUT /api/v1/admin/recipients/{recipientId}
+
+Updates recipient data.
+
+#### DELETE /api/v1/admin/recipients/{recipientId}
+
+Deletes a recipient.
 
 ---
 
@@ -314,6 +392,53 @@ Logistics tracking is inherently relational: packages → routes → drivers →
 Migrations are versioned, reproducible, and auditable. Each schema change (e.g., adding `RETURNED` state) is a new SQL migration file — reviewable in pull requests, reversible, and testable. NoSQL schema evolution is implicit and harder to govern in teams.
 
 **Engineering Decision:** PostgreSQL was chosen for its battle-tested reliability in financial and logistics systems, strong consistency guarantees, and alignment with the domain's relational nature.
+
+---
+
+## Prompt Log & Senior Criterion
+
+### Prompt Log (Mandatory)
+
+Maintain a record of prompts used for:
+
+- State-flow architecture
+- Test generation
+
+For each entry, include at minimum:
+
+- Prompt used
+- AI-generated output summary
+- Technical evaluation of that output
+- Changes applied after review
+
+Recommended template:
+
+| Date | Area | Prompt | AI Output | Technical Evaluation | Refactor/Adjustments | Final Result |
+|------|------|--------|-----------|----------------------|----------------------|--------------|
+| YYYY-MM-DD | State Flow / Tests | Prompt text | Summary | Accepted/Partially accepted/Rejected + why | What was changed | Outcome |
+
+### Senior Criterion (Mandatory)
+
+Document every AI-generated code fragment that was refactored because it did not meet:
+
+- Business logic requirements
+- Security standards
+
+For each case, specify:
+
+- What did not comply
+- Risk detected (functional or security)
+- Refactor applied
+- Expected/verified final behavior
+
+Initial project examples (already applied):
+
+- AI-proposed transition validation with centralized `if-else` logic in use-case layer was refactored to **State Pattern** in domain to preserve OCP and avoid logic scattering.
+- AI-proposed direct entity exposure in controllers was rejected and replaced with **DTO + mapper boundary** to prevent API coupling and data leakage.
+- AI-proposed JWT secret hardcoding was rejected and replaced with **environment-driven secret injection**.
+- AI-proposed repetitive controller-level `try/catch` was refactored to a **centralized global exception handler**.
+
+This section is a governance artifact, not only documentation: it is required to justify architectural and security quality decisions.
 
 ---
 

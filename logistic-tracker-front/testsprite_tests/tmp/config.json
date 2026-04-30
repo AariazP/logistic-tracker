@@ -1,0 +1,20 @@
+{
+  "status": "commited",
+  "type": "frontend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:4200",
+  "loginUser": "admin",
+  "loginPassword": "admin123",
+  "executionArgs": {
+    "projectName": "logistic-tracker-front",
+    "projectPath": "/Users/arias/Desktop/logistic-tacker/logistic-tracker-front",
+    "testIds": [],
+    "additionalInstruction": "",
+    "serverMode": "production",
+    "envs": {
+      "API_KEY": "sk-user-zSJ6_ft7z3-5V1dOezsEgCimMdtS-aVtpqxfK0q0_SCs7Qr0jfyzzFOTBCGklkFbBDTvcFAbNsVZWWyg11_20e0d41sHSBJTRwEXJK85g9Lknag-6zR73W911CuMYEu0KAo"
+    }
+  },
+  "serverPort": 62770,
+  "proxy": "http://3179c176-0bfa-4e86-bb37-8aff560b2748:ORGqLQc7PJYfeoP0iQXSuWWOMMtHurwX@tun.testsprite.com:8080"
+}

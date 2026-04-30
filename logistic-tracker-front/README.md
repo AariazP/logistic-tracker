@@ -1,214 +1,346 @@
-# SmartShip — Logistics Tracking Frontend
+# SmartShip - Logistics Tracking Frontend
 
-A production-ready Angular 21 MVP for logistics tracking. Built with standalone components, Angular Signals for state management, and Angular CDK Drag & Drop.
+Frontend web para la gestion de paquetes logisticos, construido con Angular 21, componentes standalone, Angular Signals y Angular CDK Drag and Drop.
 
----
-
-## Setup Instructions
-
-### Prerequisites
-
-- Node.js 20+ (LTS recommended)
-- npm 9+
-
-### Install Dependencies
-
-```bash
-npm install
-```
-
-### Configure API URL
-
-Edit `src/environments/environment.ts`:
-
-```ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:3000/api', // point to your backend
-};
-```
+Este repositorio implementa un MVP orientado a operaciones diarias: autenticacion por rol, visualizacion de paquetes por estado, cambios de estado con validacion de negocio y un modulo administrativo para gestionar destinatarios y conductores.
 
 ---
 
-## How to Run
+## Tabla De Contenido
 
-### Development Server
-
-```bash
-npm start
-# or
-ng serve
-```
-
-App runs at `http://localhost:4200`. It will redirect to `/login` if unauthenticated, then to `/board` after login.
-
-### Build for Production
-
-```bash
-npm run build
-```
-
-### Run Tests
-
-```bash
-npm test
-```
+- [Vision General](#vision-general)
+- [Stack Tecnologico](#stack-tecnologico)
+- [Arquitectura Del Proyecto](#arquitectura-del-proyecto)
+- [Flujo Funcional End To End](#flujo-funcional-end-to-end)
+- [Rutas Y Control De Acceso](#rutas-y-control-de-acceso)
+- [Gestion De Estado Con Signals](#gestion-de-estado-con-signals)
+- [Reglas De Negocio](#reglas-de-negocio)
+- [Integracion Con API](#integracion-con-api)
+- [Ejecucion Local](#ejecucion-local)
+- [Testing Y Calidad](#testing-y-calidad)
+- [Despliegue Con Docker](#despliegue-con-docker)
+- [Bitacora De Prompts Y Criterio Senior](#bitacora-de-prompts-y-criterio-senior)
+- [Decisiones Tecnicas Relevantes](#decisiones-tecnicas-relevantes)
 
 ---
 
-## Architecture Explanation
+## Vision General
 
-```
+SmartShip permite operar un tablero logistico con tres estados de paquete:
+
+- RECEIVED
+- IN_TRANSIT
+- DELIVERED
+
+Roles del sistema:
+
+- ADMIN: puede crear paquetes y administrar destinatarios y conductores.
+- DRIVER: puede mover paquetes entre columnas respetando transiciones validas.
+
+Objetivos del MVP:
+
+- Reducir friccion operativa en la actualizacion de estados.
+- Asegurar reglas de negocio en frontend antes de llamar al backend.
+- Mantener una arquitectura mantenible y testeable.
+
+---
+
+## Stack Tecnologico
+
+- Angular 21
+- TypeScript 5.9
+- Angular CDK (drag and drop)
+- Angular Forms (Reactive Forms)
+- RxJS (solo para flujos HTTP)
+- Signals para estado de aplicacion
+- Nginx para servir build de produccion en contenedor
+
+---
+
+## Arquitectura Del Proyecto
+
+Estructura principal:
+
+```text
 src/app/
 ├── core/
 │   ├── guards/
-│   │   └── auth.guard.ts          # authGuard (JWT check), adminGuard (role check)
+│   │   └── auth.guard.ts
 │   ├── interceptors/
-│   │   └── jwt.interceptor.ts     # Attaches Bearer token; handles 401 → redirect
+│   │   └── jwt.interceptor.ts
 │   └── services/
-│       ├── auth.store.ts          # Signals-based auth state (token, user, roles)
-│       ├── auth.service.ts        # HTTP login, delegates to AuthStore
-│       ├── package-api.service.ts # Raw HTTP calls (getAll, create, updateStatus)
-│       └── package.service.ts     # Business logic (optimistic update, revert, validation)
-│
+│       ├── admin-api.service.ts
+│       ├── auth.service.ts
+│       ├── auth.store.ts
+│       ├── package-api.service.ts
+│       └── package.service.ts
 ├── features/
 │   ├── auth/
 │   │   └── pages/
 │   │       └── login-page.component.ts
 │   └── packages/
 │       ├── components/
-│       │   ├── package-card.component.ts  # Displays a single package
-│       │   └── package-form.component.ts  # Create package (ADMIN only)
+│       │   ├── molecules/
+│       │   └── organisms/
 │       ├── pages/
-│       │   └── board-page.component.ts    # Logistics board with drag & drop
+│       │   ├── board-page.component.ts
+│       │   └── admin-page.component.ts
 │       └── store/
-│           └── package.store.ts           # Signals-based package state
-│
+│           └── package.store.ts
 └── shared/
     └── models/
-        ├── package.model.ts   # Package types + isValidTransition()
-        ├── auth.model.ts      # User, AuthCredentials, AuthResponse
-        └── api-error.model.ts
 ```
 
-### Layering
+Capas:
 
-- **Components** → UI only, no business logic, no direct HTTP
-- **Services** → business logic, coordinate API + store
-- **Store** → reactive state via Angular Signals, no RxJS
-- **Interceptors** → cross-cutting HTTP concerns (auth headers, 401 handling)
-- **Guards** → route protection based on authentication and roles
+- Components: render y eventos de UI.
+- Services: casos de uso y coordinacion entre API y store.
+- Store: estado reactivo con Signals.
+- API services: acceso HTTP puro.
+- Guards e interceptors: seguridad transversal.
 
 ---
 
-## Signals Usage Explanation
+## Flujo Funcional End To End
 
-Angular Signals (`signal()`, `computed()`, `effect()`) replace RxJS-heavy state management patterns.
+1. Usuario accede a la app.
+2. Si no hay sesion, guard redirige a login.
+3. Al autenticar, se guarda token y perfil en sessionStorage.
+4. Se carga board con paquetes agrupados por estado.
+5. DRIVER puede mover paquetes entre columnas validas.
+6. Se aplica actualizacion optimista en UI y se confirma con API.
+7. Si API falla, se revierte estado y se muestra error.
+8. ADMIN puede entrar a /admin para CRUD de destinatarios y conductores.
 
-### `PackageStore` (`features/packages/store/package.store.ts`)
+---
+
+## Rutas Y Control De Acceso
+
+Rutas definidas:
+
+- /login: acceso publico.
+- /board: requiere autenticacion.
+- /admin: requiere autenticacion y rol ADMIN.
+
+Controles de seguridad:
+
+- authGuard valida sesion activa.
+- adminGuard valida privilegios ADMIN.
+- jwtInterceptor adjunta Authorization Bearer token en requests.
+- jwtInterceptor limpia sesion y redirige a login ante HTTP 401.
+
+---
+
+## Gestion De Estado Con Signals
+
+Stores principales:
+
+- AuthStore: token, usuario y flags derivados (isAuthenticated, isAdmin, isDriver).
+- PackageStore: lista de paquetes, loading, error y paquetes agrupados por estado.
+
+Patron aplicado:
+
+- Signals como unica fuente de verdad del estado de UI.
+- Computed para derivaciones (ejemplo: packagesByStatus).
+- RxJS restringido a pipelines HTTP en servicios.
+
+Beneficios:
+
+- Menos complejidad accidental por subscripciones manuales.
+- Re-render reactivo y predecible en componentes.
+- Separacion clara entre estado y transporte de datos.
+
+---
+
+## Reglas De Negocio
+
+Transiciones permitidas de estado:
+
+- RECEIVED -> IN_TRANSIT
+- IN_TRANSIT -> DELIVERED
+- DELIVERED -> sin salida
+
+Estas reglas viven en modelos compartidos y se validan antes de invocar la API.
+
+En movimiento de paquete:
+
+- Se valida transicion.
+- Se aplica cambio optimista.
+- Se persiste en backend.
+- Se revierte si hay error.
+
+---
+
+## Integracion Con API
+
+Base URL configurable en entorno:
+
+- src/environments/environment.ts
+
+Endpoints consumidos:
+
+- Auth:
+  - POST /auth/login
+- Packages:
+  - GET /packages
+  - GET /packages/:trackingId
+  - POST /packages
+  - PATCH /packages/:trackingId/status
+- Admin:
+  - GET/POST/PUT/DELETE /admin/recipients
+  - GET/POST/DELETE /admin/drivers
+
+---
+
+## Ejecucion Local
+
+Prerequisitos:
+
+- Node.js 20+
+- npm 9+
+
+Instalacion:
+
+```bash
+npm install
+```
+
+Configurar API:
 
 ```ts
-// Private writable signal
-private readonly _packages = signal<Package[]>([]);
-
-// Public read-only derived signal
-readonly packages = computed(() => this._packages());
-
-// Derived computation — updates automatically when _packages changes
-readonly packagesByStatus = computed(() => {
-  const all = this._packages();
-  return PACKAGE_STATUSES.reduce<Record<PackageStatus, Package[]>>(...);
-});
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api',
+};
 ```
 
-The board component binds directly to `store.packagesByStatus()`. When `PackageService` calls `store.updatePackageStatus(...)`, every dependent computed signal re-evaluates and the template re-renders — no subscriptions needed.
+Comandos:
 
-### `AuthStore` (`core/services/auth.store.ts`)
+```bash
+# desarrollo
+npm start
 
-```ts
-readonly isAdmin = computed(() => this._user()?.role === 'ADMIN');
+# build
+npm run build
+
+# pruebas unitarias
+npm test
 ```
 
-Used in templates: `@if (authStore.isAdmin()) { <app-package-form /> }` — role-based UI derived purely from signal state.
+Aplicacion local por defecto:
 
-### Optimistic Update + Revert Pattern
+- http://localhost:4200
 
-```ts
-// Immediately update UI (signal mutation)
-this.store.updatePackageStatus(id, toStatus);
+---
 
-// If backend rejects:
-catchError((err) => {
-  this.store.revertPackageStatus(id, fromStatus); // revert signal
-  this.store.setError(err.error?.message);
-  return throwError(() => err);
-})
+## Testing Y Calidad
+
+Se incluyen pruebas unitarias para piezas clave del dominio y servicios.
+
+Enfoque de testeo:
+
+- Modelos y reglas puras (ejemplo: validacion de transiciones).
+- Stores y servicios con foco en estado, errores y casos de negocio.
+- Validacion de escenarios de error de API y rollback de estado.
+
+Para ejecutar:
+
+```bash
+npm test
 ```
 
-RxJS is used **only** for HTTP calls (as required by `HttpClient`). All state is managed exclusively via Signals.
+Carpeta de reporte de cobertura disponible en coverage/.
 
 ---
 
-## 🔥 AI Skill Log
+## Despliegue Con Docker
 
-### Skills Applied
+El proyecto usa build multi-stage:
 
-This project was built with the following agent skills active:
+1. Stage builder con Node (compila Angular).
+2. Stage runtime con Nginx (sirve estaticos).
 
-- `angular-standalone-components` — Enforced `standalone: true` on all components; no NgModules anywhere
-- `angular-solid-principles` — Enforced SRP: components have no business logic; services have a single responsibility; `PackageApiService` (raw HTTP) is separated from `PackageService` (business logic)
-- `senior-engineering-judgment` — Applied to trade-off decisions around state management
+Build de imagen:
 
----
+```bash
+docker build -t smartship-frontend .
+```
 
-### Prompt Log: Signals-Based State Design
+Ejecucion:
 
-**Prompt used:**
-> "Design a Signals-based store for Angular 21 that holds package list state, exposes a computed packagesByStatus grouped by RECEIVED/IN_TRANSIT/DELIVERED, and supports optimistic updates with revert on error."
+```bash
+docker run --rm -p 8080:80 smartship-frontend
+```
 
-**What was generated:**
-An initial version that used `BehaviorSubject` from RxJS to hold state and emitted via `toSignal()`.
+App disponible en:
 
-**Why it was REJECTED:**
-- Violated the Signals philosophy: the state source was RxJS, Signals were just a thin wrapper
-- `toSignal()` adds unnecessary observable infrastructure when `signal()` + `computed()` is sufficient
-- The `effect()` was used to subscribe to store changes and trigger side effects — this is an anti-pattern for data flow
-
-**What was REFACTORED to:**
-- `signal<Package[]>([])` as the single source of truth
-- `computed()` for all derived state (`packagesByStatus`, `loading`, `error`)
-- Direct mutation via `store.setPackages()` / `store.updatePackageStatus()` — clean imperative API that services call
-- RxJS retained **only** in services for `HttpClient` pipelines (`tap`, `catchError`)
+- http://localhost:8080
 
 ---
 
-### Prompt Log: Drag & Drop Implementation
+## Bitacora De Prompts Y Criterio Senior
 
-**Prompt used:**
-> "Implement Angular CDK drag & drop for a logistics board with 3 columns (RECEIVED, IN_TRANSIT, DELIVERED). On drop, call a service to update status. If backend rejects, revert the UI state and show error."
+### Bitacora De Prompts
 
-**What was generated:**
-An initial version that called `moveItemInArray` / `transferArrayItem` on a local array copy held in the component, then triggered a full `loadPackages()` refresh from the API on success or failure.
+Registro obligatorio de prompts usados para:
 
-**Why it was REJECTED/REFACTORED:**
-- Holding a local copy of packages in the component created a second source of truth alongside the `PackageStore` — violates SRP
-- Full API reload after every move is wasteful and creates visible flicker
-- The CDK `[cdkDropListData]` binding was pointing to the local copy, not the store's signal — they could diverge
+- Arquitectura del flujo de estados.
+- Generacion de tests.
 
-**What was REFACTORED to:**
-- `[cdkDropListData]` binds to `store.packagesByStatus()[status]` (derived from signal)
-- Optimistic update is done immediately via `store.updatePackageStatus()` (mutates the signal)
-- On backend error, `store.revertPackageStatus()` restores the previous status — the CDK list re-renders from the signal automatically
-- No local array copies in the component; the store is the single source of truth
+Cada entrada debe incluir como minimo:
+
+- Prompt utilizado.
+- Resultado generado por IA.
+- Evaluacion tecnica del resultado.
+- Cambios aplicados tras revision.
+
+### Criterio Senior
+
+Es obligatorio detallar que codigo generado por IA fue refactorizado por no cumplir:
+
+- Logica de negocio.
+- Estandares de seguridad.
+
+Para cada refactor registrar:
+
+- Que parte no cumplia.
+- Riesgo detectado (funcional o de seguridad).
+- Refactor aplicado.
+- Resultado final esperado.
+
+### Registro Actual De Ejemplos
+
+#### Caso 1: Store de estado
+
+- Prompt: disenar store con Signals para paquetes y agrupacion por estado.
+- Generado inicialmente: estado con BehaviorSubject y conversion a Signal.
+- Problema detectado: doble abstraccion, complejidad innecesaria, patron no alineado con Signals-first.
+- Refactor aplicado: signal y computed como fuente unica de verdad; RxJS solo en HTTP.
+
+#### Caso 2: Drag and drop
+
+- Prompt: implementar tablero con drag and drop y rollback en error.
+- Generado inicialmente: copia local de arrays y recarga completa de API por movimiento.
+- Problema detectado: doble fuente de verdad, flicker y sobrecosto de red.
+- Refactor aplicado: binding directo al store, update optimista, revert en fallo sin recarga total.
 
 ---
 
-### Other Notable Decisions
+## Decisiones Tecnicas Relevantes
 
-| Decision | Rationale |
+| Decision | Razon |
 |---|---|
-| `sessionStorage` for JWT | Secure against XSS compared to `localStorage`; clears on tab close |
-| `PackageApiService` + `PackageService` split | ISP: consumers that only need API calls don't get business logic baggage |
-| `isValidTransition()` in model layer | Pure function, easily testable, enforces business rules client-side before hitting the API |
-| Functional interceptor (`HttpInterceptorFn`) | Required by `provideHttpClient(withInterceptors([...]))` — the modern Angular 17+ pattern; class-based interceptors with `HTTP_INTERCEPTORS` were rejected |
-| `adminGuard` redirects to `/board` not `/403` | MVP simplicity; a real implementation would show a proper forbidden page |
+| sessionStorage para token | Persistencia por pestana y menor ventana de riesgo frente a almacenamiento permanente |
+| Separar PackageApiService de PackageService | Aisla transporte HTTP de reglas de negocio |
+| Reglas de transicion en modelos compartidos | Facilita pruebas unitarias y consistencia del dominio |
+| Interceptor funcional | Patron moderno de Angular para provideHttpClient con interceptores |
+| Guards por rol | Control de acceso temprano a nivel de routing |
+
+---
+
+## Scripts Disponibles
+
+- npm start: levanta servidor de desarrollo.
+- npm run build: genera build de produccion.
+- npm run watch: build en modo watch para desarrollo.
+- npm test: ejecuta pruebas unitarias.

@@ -1,0 +1,16 @@
+<header class="navbar">
+  <div class="navbar-brand">
+    <span class="brand-icon">📦</span>
+    <span>SmartShip</span>
+  </div>
+  <div class="navbar-right">
+    @if (showAdminButton()) {
+      <button class="btn-admin" (click)="openAdmin.emit()">Manage drivers and recipients</button>
+    }
+    <span class="user-badge">
+      {{ user()?.username }}
+      <span class="role-tag">{{ user()?.role }}</span>
+    </span>
+    <button class="btn-logout" (click)="logout.emit()">Logout</button>
+  </div>
+</header>

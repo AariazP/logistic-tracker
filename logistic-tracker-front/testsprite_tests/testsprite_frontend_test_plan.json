@@ -1,0 +1,715 @@
+[
+  {
+    "id": "TC001",
+    "title": "Log in and reach the package board with status columns visible",
+    "description": "Verifies an unauthenticated user can log in and is redirected to the board where packages are displayed in three status columns.",
+    "category": "User Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the package board"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify packages are displayed grouped into three status columns"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "View packages grouped by status on the board",
+    "description": "Verifies an authenticated user can open the board and see packages grouped by RECEIVED, IN_TRANSIT, and DELIVERED.",
+    "category": "Package Board Monitoring",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify packages are displayed grouped into three status columns"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Move package from RECEIVED to IN_TRANSIT via drag and drop",
+    "description": "Verifies a dispatcher can drag a package from RECEIVED to IN_TRANSIT and the card appears in IN_TRANSIT after the move.",
+    "category": "Package Status Transition",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Drag a package card from the RECEIVED column and drop it into the IN_TRANSIT column"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dragged package card is displayed in the IN_TRANSIT column"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Admin can view recipients and drivers lists",
+    "description": "Verifies an ADMIN user can access the admin area and see both recipients and drivers lists loaded.",
+    "category": "Admin Recipient and Driver Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation option to open the admin area"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the recipients list is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the drivers list is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Filter board by status and then clear filters to restore full board",
+    "description": "Verifies a user can filter packages by a selected status and then clear the filter to reload the full board dataset.",
+    "category": "Package Board Monitoring",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Select a status in the board status filter control"
+      },
+      {
+        "type": "action",
+        "description": "Clear the status filter"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify packages are displayed across all three status columns"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Search by tracking ID and clear search to restore full board",
+    "description": "Verifies a user can search for a package by tracking ID and then clear the search to reload the full board dataset.",
+    "category": "Package Board Monitoring",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Fill a tracking ID value from an existing visible package card into the tracking ID search field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the tracking ID search"
+      },
+      {
+        "type": "action",
+        "description": "Clear the tracking ID search"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify packages are displayed across the board again (not limited to the prior search result)"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Create a package from the board and see it appear on the board",
+    "description": "Verifies an authenticated ops user can create a new package by selecting a recipient and submitting the form, and the new package appears on the board with success feedback.",
+    "category": "Package Creation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the package creation form"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique tracking ID into the tracking ID field"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid weight into the weight field"
+      },
+      {
+        "type": "action",
+        "description": "Fill valid dimensions into the dimensions fields"
+      },
+      {
+        "type": "action",
+        "description": "Select a recipient from the recipient list"
+      },
+      {
+        "type": "action",
+        "description": "Submit the package creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the newly created package appears on the board"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC008",
+    "title": "Admin can create a recipient and see it in the list",
+    "description": "Verifies an ADMIN user can create a new recipient with required fields and the new recipient appears in the recipients list.",
+    "category": "Admin Recipient and Driver Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation option to open the admin area"
+      },
+      {
+        "type": "action",
+        "description": "Open the recipient creation form"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique recipient name into the recipient name field"
+      },
+      {
+        "type": "action",
+        "description": "Fill valid recipient contact details into the required fields"
+      },
+      {
+        "type": "action",
+        "description": "Submit the recipient creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new recipient appears in the recipients list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC009",
+    "title": "Admin can create a driver and see it in the drivers list",
+    "description": "Verifies an ADMIN user can create a new driver with required fields and the new driver appears in the drivers list.",
+    "category": "Admin Recipient and Driver Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation option to open the admin area"
+      },
+      {
+        "type": "action",
+        "description": "Open the driver creation form"
+      },
+      {
+        "type": "action",
+        "description": "Fill a unique driver identifier into the required driver field"
+      },
+      {
+        "type": "action",
+        "description": "Fill valid driver details into the remaining required fields"
+      },
+      {
+        "type": "action",
+        "description": "Submit the driver creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new driver appears in the drivers list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC010",
+    "title": "Admin can edit an existing recipient and see updates reflected",
+    "description": "Verifies an ADMIN user can edit an existing recipient and the updated data is reflected in the recipients list.",
+    "category": "Admin Recipient and Driver Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation option to open the admin area"
+      },
+      {
+        "type": "action",
+        "description": "Create a new recipient with a unique name for editing"
+      },
+      {
+        "type": "action",
+        "description": "Open the edit view for that recipient"
+      },
+      {
+        "type": "action",
+        "description": "Update the recipient name with a new unique value"
+      },
+      {
+        "type": "action",
+        "description": "Submit the recipient edits"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the recipient shows the updated value in the recipients list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC011",
+    "title": "Package creation form can be opened and recipient options are available",
+    "description": "Verifies the package creation form opens from the board and provides recipient options for selection.",
+    "category": "Package Creation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the package creation form"
+      },
+      {
+        "type": "action",
+        "description": "Open the recipient selector"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify recipient options are displayed for selection"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the package creation form fields are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC012",
+    "title": "Admin can delete a recipient after confirming",
+    "description": "Verifies an ADMIN user can delete a recipient by confirming deletion and the recipient is removed from the recipients list.",
+    "category": "Admin Recipient and Driver Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation option to open the admin area"
+      },
+      {
+        "type": "action",
+        "description": "Create a new recipient with a unique name for deletion"
+      },
+      {
+        "type": "action",
+        "description": "Initiate deletion for that recipient"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion in the app confirmation UI"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the recipient no longer appears in the recipients list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC013",
+    "title": "Admin can delete a driver after confirming",
+    "description": "Verifies an ADMIN user can delete a driver by confirming deletion and the driver is removed from the drivers list.",
+    "category": "Admin Recipient and Driver Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Click the navigation option to open the admin area"
+      },
+      {
+        "type": "action",
+        "description": "Create a new driver with a unique identifier for deletion"
+      },
+      {
+        "type": "action",
+        "description": "Initiate deletion for that driver"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion in the app confirmation UI"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the driver no longer appears in the drivers list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success confirmation is visible"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Package creation requires tracking ID",
+    "description": "Verifies submitting the package creation form without a tracking ID shows a validation error and does not create a package.",
+    "category": "Package Creation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the package creation form"
+      },
+      {
+        "type": "action",
+        "description": "Fill a valid weight into the weight field"
+      },
+      {
+        "type": "action",
+        "description": "Fill valid dimensions into the dimensions fields"
+      },
+      {
+        "type": "action",
+        "description": "Select a recipient from the recipient list"
+      },
+      {
+        "type": "action",
+        "description": "Submit the package creation form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a required-field validation error is visible for the tracking ID field"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the package is not created on the board"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC015",
+    "title": "Prevent invalid move from DELIVERED to RECEIVED",
+    "description": "Verifies an invalid drag-and-drop transition from DELIVERED to RECEIVED is blocked and the package remains in DELIVERED with a validation error shown.",
+    "category": "Package Status Transition",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Drag a package card from the DELIVERED column and drop it into the RECEIVED column"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a status transition validation error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the dragged package card remains displayed in the DELIVERED column"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC016",
+    "title": "Reject login with incorrect credentials",
+    "description": "Verifies a user cannot log in with incorrect credentials and sees an invalid credentials error.",
+    "category": "User Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the username field with invalid_user"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with invalid_password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an invalid credential error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user remains on the login page"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC017",
+    "title": "Validate required fields on empty login submit",
+    "description": "Verifies submitting the login form with empty required fields shows validation errors and does not proceed to the board.",
+    "category": "User Login",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify required field validation errors are visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user remains on the login page"
+      }
+    ],
+    "priority": "Low"
+  }
+]

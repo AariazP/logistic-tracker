@@ -1,0 +1,64 @@
+<div class="board-layout">
+  <app-board-navbar
+    [user]="authStore.user()"
+    [showAdminButton]="authStore.isAdmin()"
+    (openAdmin)="goToAdminManagement()"
+    (logout)="logout()"
+  />
+
+  <main class="board-content">
+    @if (authStore.isAdmin()) {
+      <app-package-form (packageCreated)="onPackageCreated()" />
+    }
+
+    <app-package-search-filter
+      [trackingQuery]="trackingQuery()"
+      [selectedStatus]="selectedStatus()"
+      [statuses]="statuses"
+      (trackingQueryChange)="trackingQuery.set($event)"
+      (selectedStatusChange)="onStatusFilterChange($event)"
+      (searchTracking)="searchByTrackingId()"
+      (clearTracking)="clearTrackingSearch()"
+      (refresh)="loadPackages()"
+    />
+
+    @if (selectedPackage()) {
+      <section class="detail-card" aria-live="polite">
+        <div class="detail-header">
+          <strong>Tracking detail: {{ selectedPackage()!.trackingId }}</strong>
+          <span class="status-chip">{{ selectedPackage()!.status }}</span>
+        </div>
+        <p>
+          Recipient: {{ selectedPackage()!.recipientName }} | Weight: {{ selectedPackage()!.weight }} kg | Dimensions:
+          {{ selectedPackage()!.dimensions }}
+        </p>
+      </section>
+    }
+
+    @if (store.error()) {
+      <div class="global-error">
+        <span>⚠ {{ store.error() }}</span>
+        <button (click)="clearError()" class="close-btn">✕</button>
+      </div>
+    }
+
+    @if (store.loading()) {
+      <div class="loading-state">Loading packages...</div>
+    }
+
+    @if (!authStore.isDriver()) {
+      <div class="info-banner">
+        Drag and drop is available only for users with the DRIVER role.
+      </div>
+    }
+
+    <app-package-board-columns
+      [statuses]="statuses"
+      [packagesByStatus]="store.packagesByStatus()"
+      [connectedDropLists]="connectedDropLists"
+      [draggable]="authStore.isDriver()"
+      [canEnterDropList]="canEnterDropList"
+      (dropToStatus)="onDrop($event.event, $event.status)"
+    />
+  </main>
+</div>
