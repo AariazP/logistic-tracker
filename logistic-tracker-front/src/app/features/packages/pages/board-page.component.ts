@@ -1,11 +1,11 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { CdkDragDrop, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { PackageStore } from '../store/package.store';
 import { PackageService } from '../../../core/services/package.service';
 import { AuthStore } from '../../../core/services/auth.store';
 import { PackageFormComponent } from '../components/package-form.component';
 import { PackageCardComponent } from '../components/package-card.component';
-import { Package, PackageStatus, PACKAGE_STATUSES } from '../../../shared/models';
+import { isValidTransition, Package, PackageStatus, PACKAGE_STATUSES } from '../../../shared/models';
 import { Router } from '@angular/router';
 
 @Component({
@@ -69,6 +69,7 @@ import { Router } from '@angular/router';
                 [id]="status"
                 [cdkDropListData]="getColumnPackages(status)"
                 [cdkDropListConnectedTo]="connectedDropLists"
+                [cdkDropListEnterPredicate]="canEnterDropList"
                 (cdkDropListDropped)="onDrop($event, status)"
                 [class.cdk-drop-list-dragging]="isDragging()"
               >
@@ -296,6 +297,18 @@ export class BoardPageComponent implements OnInit {
     return this.store.packagesByStatus()[status] ?? [];
   }
 
+  readonly canEnterDropList = (drag: CdkDrag<Package>, drop: CdkDropList<Package[]>): boolean => {
+    if (!this.authStore.isDriver()) return false;
+
+    const pkg = drag.data;
+    const targetStatus = drop.id as PackageStatus;
+
+    if (!pkg) return false;
+    if (pkg.status === targetStatus) return true;
+
+    return isValidTransition(pkg.status, targetStatus);
+  };
+
   onDrop(event: CdkDragDrop<Package[]>, targetStatus: PackageStatus): void {
     if (event.previousContainer === event.container) return;
     if (!this.authStore.isDriver()) {
@@ -307,14 +320,10 @@ export class BoardPageComponent implements OnInit {
     const fromStatus = pkg.status;
 
     if (fromStatus === targetStatus) return;
-
-    // Optimistic UI update via CDK
-    transferArrayItem(
-      event.previousContainer.data,
-      event.container.data,
-      event.previousIndex,
-      event.currentIndex,
-    );
+    if (!isValidTransition(fromStatus, targetStatus)) {
+      this.store.setError(`Invalid transition: ${fromStatus} → ${targetStatus}`);
+      return;
+    }
 
     this.packageService.movePackage(pkg, targetStatus).subscribe({
       error: () => {
