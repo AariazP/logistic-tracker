@@ -1,5 +1,9 @@
 package com.vcsoft.logistic_tracker_back.application.usecase;
 
+import com.vcsoft.logistic_tracker_back.application.usecase.recipients.CreateRecipientUseCaseImpl;
+import com.vcsoft.logistic_tracker_back.application.usecase.recipients.DeleteRecipientUseCaseImpl;
+import com.vcsoft.logistic_tracker_back.application.usecase.recipients.ListRecipientsUseCaseImpl;
+import com.vcsoft.logistic_tracker_back.application.usecase.recipients.UpdateRecipientUseCaseImpl;
 import com.vcsoft.logistic_tracker_back.domain.port.out.PackageRepository;
 import com.vcsoft.logistic_tracker_back.domain.port.out.RecipientRepository;
 import com.vcsoft.logistic_tracker_back.domain.exception.RecipientDeletionNotAllowedException;

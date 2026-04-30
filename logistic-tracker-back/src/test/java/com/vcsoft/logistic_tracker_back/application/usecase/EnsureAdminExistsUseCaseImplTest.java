@@ -1,5 +1,6 @@
 package com.vcsoft.logistic_tracker_back.application.usecase;
 
+import com.vcsoft.logistic_tracker_back.application.usecase.auth.EnsureAdminExistsUseCaseImpl;
 import com.vcsoft.logistic_tracker_back.domain.port.out.PasswordHasher;
 import com.vcsoft.logistic_tracker_back.domain.port.out.UserRepository;
 import org.junit.jupiter.api.DisplayName;
