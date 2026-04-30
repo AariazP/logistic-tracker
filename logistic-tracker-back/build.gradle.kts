@@ -66,3 +66,16 @@ tasks.named<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 }
+
+// Compatibility alias for legacy builds that still reference this old task name.
+tasks.register("jacocoCoverageVerification") {
+    group = "verification"
+    description = "Alias to keep compatibility with jacocoTestCoverageVerification naming."
+    dependsOn(
+        if (tasks.findByName("jacocoTestCoverageVerification") != null) {
+            "jacocoTestCoverageVerification"
+        } else {
+            "jacocoTestReport"
+        }
+    )
+}
