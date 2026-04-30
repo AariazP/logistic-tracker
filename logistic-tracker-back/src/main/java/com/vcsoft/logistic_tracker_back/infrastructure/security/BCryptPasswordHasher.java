@@ -1,6 +1,6 @@
 package com.vcsoft.logistic_tracker_back.infrastructure.security;
 
-import com.vcsoft.logistic_tracker_back.application.port.output.PasswordHasher;
+import com.vcsoft.logistic_tracker_back.domain.port.out.PasswordHasher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 

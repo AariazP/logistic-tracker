@@ -1,7 +1,7 @@
 package com.vcsoft.logistic_tracker_back.application.usecase;
 
-import com.vcsoft.logistic_tracker_back.application.port.output.PasswordHasher;
-import com.vcsoft.logistic_tracker_back.application.port.output.UserRepository;
+import com.vcsoft.logistic_tracker_back.domain.port.out.PasswordHasher;
+import com.vcsoft.logistic_tracker_back.domain.port.out.UserRepository;
 import com.vcsoft.logistic_tracker_back.domain.exception.UserNotFoundException;
 import com.vcsoft.logistic_tracker_back.domain.model.AppUser;
 import com.vcsoft.logistic_tracker_back.domain.model.UserRole;

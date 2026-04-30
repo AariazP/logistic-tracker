@@ -1,6 +1,6 @@
 package com.vcsoft.logistic_tracker_back.infrastructure.persistence.adapter;
 
-import com.vcsoft.logistic_tracker_back.application.port.output.UserRepository;
+import com.vcsoft.logistic_tracker_back.domain.port.out.UserRepository;
 import com.vcsoft.logistic_tracker_back.domain.model.AppUser;
 import com.vcsoft.logistic_tracker_back.domain.model.UserRole;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.entity.UserEntity;

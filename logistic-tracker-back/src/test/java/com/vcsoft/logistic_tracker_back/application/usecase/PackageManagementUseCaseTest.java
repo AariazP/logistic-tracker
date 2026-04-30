@@ -1,7 +1,7 @@
 package com.vcsoft.logistic_tracker_back.application.usecase;
 
-import com.vcsoft.logistic_tracker_back.application.port.output.PackageRepository;
-import com.vcsoft.logistic_tracker_back.application.port.output.RecipientRepository;
+import com.vcsoft.logistic_tracker_back.domain.port.out.PackageRepository;
+import com.vcsoft.logistic_tracker_back.domain.port.out.RecipientRepository;
 import com.vcsoft.logistic_tracker_back.domain.exception.InvalidStateTransitionException;
 import com.vcsoft.logistic_tracker_back.domain.exception.PackageNotFoundException;
 import com.vcsoft.logistic_tracker_back.domain.exception.RecipientNotFoundException;

@@ -1,6 +1,6 @@
 package com.vcsoft.logistic_tracker_back.infrastructure.persistence.adapter;
 
-import com.vcsoft.logistic_tracker_back.application.port.output.RecipientRepository;
+import com.vcsoft.logistic_tracker_back.domain.port.out.RecipientRepository;
 import com.vcsoft.logistic_tracker_back.domain.model.Recipient;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.entity.RecipientEntity;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.mapper.RecipientPersistenceMapper;

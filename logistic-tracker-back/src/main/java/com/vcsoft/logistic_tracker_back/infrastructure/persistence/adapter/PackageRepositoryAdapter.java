@@ -1,6 +1,6 @@
 package com.vcsoft.logistic_tracker_back.infrastructure.persistence.adapter;
 
-import com.vcsoft.logistic_tracker_back.application.port.output.PackageRepository;
+import com.vcsoft.logistic_tracker_back.domain.port.out.PackageRepository;
 import com.vcsoft.logistic_tracker_back.domain.model.Package;
 import com.vcsoft.logistic_tracker_back.domain.model.PackageStatus;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.entity.PackageEntity;
