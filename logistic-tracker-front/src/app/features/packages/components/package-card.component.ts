@@ -5,7 +5,7 @@ import { Package } from '../../../shared/models';
   selector: 'app-package-card',
   standalone: true,
   template: `
-    <div class="package-card">
+    <div class="package-card" [class.is-draggable]="draggable()" [attr.aria-disabled]="!draggable()">
       <div class="card-header">
         <span class="tracking-id">{{ pkg().trackingId }}</span>
         <span class="status-badge" [class]="'status-' + pkg().status.toLowerCase()">
@@ -35,10 +35,13 @@ import { Package } from '../../../shared/models';
       padding: 0.875rem 1rem;
       box-shadow: 0 1px 6px rgba(0,0,0,0.07);
       border: 1.5px solid #e5e7eb;
-      cursor: grab;
+      cursor: default;
       transition: box-shadow 0.2s, transform 0.15s;
     }
-    .package-card:hover {
+    .package-card.is-draggable {
+      cursor: grab;
+    }
+    .package-card.is-draggable:hover {
       box-shadow: 0 4px 16px rgba(0,0,0,0.12);
       transform: translateY(-1px);
     }
@@ -80,4 +83,5 @@ import { Package } from '../../../shared/models';
 })
 export class PackageCardComponent {
   readonly pkg = input.required<Package>();
+  readonly draggable = input<boolean>(true);
 }

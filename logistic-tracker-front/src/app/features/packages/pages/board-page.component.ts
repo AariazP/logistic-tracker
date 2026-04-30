@@ -48,6 +48,12 @@ import { Router } from '@angular/router';
           <div class="loading-state">Loading packages...</div>
         }
 
+        @if (!authStore.isDriver()) {
+          <div class="info-banner">
+            Drag and drop is available only for users with the DRIVER role.
+          </div>
+        }
+
         <!-- Logistics Board -->
         <div class="board-columns">
           @for (status of statuses; track status) {
@@ -67,8 +73,15 @@ import { Router } from '@angular/router';
                 [class.cdk-drop-list-dragging]="isDragging()"
               >
                 @for (pkg of store.packagesByStatus()[status]; track pkg.id) {
-                  <div cdkDrag [cdkDragData]="pkg" [cdkDragDisabled]="!authStore.isDriver()">
-                    <app-package-card [pkg]="pkg" />
+                  <div
+                    cdkDrag
+                    [cdkDragData]="pkg"
+                    [cdkDragDisabled]="!authStore.isDriver()"
+                    (cdkDragStarted)="isDragging.set(true)"
+                    (cdkDragEnded)="isDragging.set(false)"
+                    class="drag-item"
+                  >
+                    <app-package-card [pkg]="pkg" [draggable]="authStore.isDriver()" />
                     <div *cdkDragPlaceholder class="drag-placeholder"></div>
                   </div>
                 }
@@ -175,6 +188,15 @@ import { Router } from '@angular/router';
       color: #6b7280;
       padding: 2rem;
     }
+    .info-banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1d4ed8;
+      padding: 0.65rem 0.85rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+    }
     .board-columns {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -242,6 +264,9 @@ import { Router } from '@angular/router';
       background: #eff6ff;
       border: 2px dashed #93c5fd;
       border-radius: 10px;
+    }
+    .drag-item.cdk-drag-disabled {
+      opacity: 0.9;
     }
     .cdk-drag-animating {
       transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
