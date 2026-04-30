@@ -1,5 +1,6 @@
 package com.vcsoft.logistic_tracker_back.adapter.mapper;
 
+import com.vcsoft.logistic_tracker_back.application.dto.response.DriverResponse;
 import com.vcsoft.logistic_tracker_back.domain.model.AppUser;
 import org.springframework.stereotype.Component;
 
