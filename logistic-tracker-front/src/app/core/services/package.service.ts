@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { PackageApiService } from './package-api.service';
 import { PackageStore } from '../../features/packages/store/package.store';
-import { Package, PackageStatus, CreatePackageRequest, isValidTransition } from '../../shared/models';
+import { Package, PackageStatus, CreatePackageRequest, isValidTransition, getApiErrorMessage } from '../../shared/models';
 
 @Injectable({ providedIn: 'root' })
 export class PackageService {
@@ -19,7 +19,7 @@ export class PackageService {
       }),
       catchError((err) => {
         this.store.setLoading(false);
-        this.store.setError(err.error?.message ?? 'Failed to load packages');
+        this.store.setError(getApiErrorMessage(err, 'Failed to load packages'));
         return throwError(() => err);
       }),
     );
@@ -30,13 +30,16 @@ export class PackageService {
     return this.api.create(payload).pipe(
       tap((pkg) => this.store.addPackage(pkg)),
       catchError((err) => {
-        this.store.setError(err.error?.message ?? 'Failed to create package');
+        this.store.setError(getApiErrorMessage(err, 'Failed to create package'));
         return throwError(() => err);
       }),
     );
   }
 
-  movePackage(id: string, fromStatus: PackageStatus, toStatus: PackageStatus): Observable<Package> {
+  movePackage(pkg: Package, toStatus: PackageStatus): Observable<Package> {
+    const fromStatus = pkg.status;
+    const packageId = pkg.id;
+
     if (!isValidTransition(fromStatus, toStatus)) {
       const msg = `Invalid transition: ${fromStatus} → ${toStatus}`;
       this.store.setError(msg);
@@ -44,15 +47,15 @@ export class PackageService {
     }
 
     // Optimistic update
-    this.store.updatePackageStatus(id, toStatus);
+    this.store.updatePackageStatus(packageId, toStatus);
     this.store.clearError();
 
-    return this.api.updateStatus(id, { status: toStatus }).pipe(
-      tap((updated) => this.store.updatePackageStatus(id, updated.status)),
+    return this.api.updateStatus(pkg.trackingId, { status: toStatus }).pipe(
+      tap((updated) => this.store.updatePackageStatus(packageId, updated.status)),
       catchError((err) => {
         // Revert on failure
-        this.store.revertPackageStatus(id, fromStatus);
-        this.store.setError(err.error?.message ?? 'Failed to move package');
+        this.store.revertPackageStatus(packageId, fromStatus);
+        this.store.setError(getApiErrorMessage(err, 'Failed to move package'));
         return throwError(() => err);
       }),
     );

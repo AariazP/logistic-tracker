@@ -9,5 +9,5 @@ CREATE TABLE users (
 
 -- Seed default users (passwords are BCrypt of 'admin123' and 'driver123')
 INSERT INTO users (username, password, role) VALUES
-    ('admin',  '$2a$12$GOFRGnQRTGPQX7oQiNQ3r.m0uHBU3NkFx4OILJwlGEBJn09GV.nMy', 'ADMIN'),
-    ('driver', '$2a$12$gDJ3FjXhbCUAmFMibNaSzuFi4SVLP8K.OtNxoMYFRR7JHUqLiJXzW', 'DRIVER');
+    ('admin',  '$2a$12$57qmD4ZkvtsrNQuHZdaUpOuxFFvItzMD/bKGhISCkp2g.QhWaT7ey', 'ADMIN'),
+    ('driver', '$2a$12$8nOx/N2//4jTwIo.05xMLOcTY9JCHlpPosHjor/HxoBEfWz72SK5K', 'DRIVER');

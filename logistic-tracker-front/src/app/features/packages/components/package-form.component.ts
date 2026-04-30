@@ -1,7 +1,7 @@
 import { Component, inject, signal, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PackageService } from '../../../core/services/package.service';
-import { CreatePackageRequest } from '../../../shared/models';
+import { CreatePackageRequest, getApiErrorMessage } from '../../../shared/models';
 
 @Component({
   selector: 'app-package-form',
@@ -175,10 +175,10 @@ export class PackageFormComponent {
   readonly success = signal(false);
 
   readonly form = this.fb.group({
-    trackingId: ['', Validators.required],
+    trackingId: ['', [Validators.required, Validators.maxLength(100)]],
     weight: [null as number | null, [Validators.required, Validators.min(0.01)]],
-    dimensions: ['', Validators.required],
-    recipientName: ['', Validators.required],
+    dimensions: ['', [Validators.required, Validators.maxLength(255)]],
+    recipientName: ['', [Validators.required, Validators.maxLength(255)]],
   });
 
   isInvalid(field: string): boolean {
@@ -206,7 +206,7 @@ export class PackageFormComponent {
       },
       error: (err: unknown) => {
         this.loading.set(false);
-        const msg = err instanceof Error ? err.message : 'Failed to register package';
+        const msg = getApiErrorMessage(err, 'Failed to register package');
         this.error.set(msg);
       },
     });

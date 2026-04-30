@@ -14,7 +14,10 @@ export class AuthService {
   login(credentials: AuthCredentials): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.baseUrl}/login`, credentials).pipe(
       tap((response) => {
-        this.authStore.setAuth(response.token, response.user);
+        this.authStore.setAuth(response.token, {
+          username: credentials.username,
+          role: response.role,
+        });
       }),
     );
   }

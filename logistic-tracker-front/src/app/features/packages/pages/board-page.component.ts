@@ -67,7 +67,7 @@ import { Router } from '@angular/router';
                 [class.cdk-drop-list-dragging]="isDragging()"
               >
                 @for (pkg of store.packagesByStatus()[status]; track pkg.id) {
-                  <div cdkDrag [cdkDragData]="pkg">
+                  <div cdkDrag [cdkDragData]="pkg" [cdkDragDisabled]="!authStore.isDriver()">
                     <app-package-card [pkg]="pkg" />
                     <div *cdkDragPlaceholder class="drag-placeholder"></div>
                   </div>
@@ -273,6 +273,10 @@ export class BoardPageComponent implements OnInit {
 
   onDrop(event: CdkDragDrop<Package[]>, targetStatus: PackageStatus): void {
     if (event.previousContainer === event.container) return;
+    if (!this.authStore.isDriver()) {
+      this.store.setError('Only DRIVER users can update package status.');
+      return;
+    }
 
     const pkg: Package = event.item.data;
     const fromStatus = pkg.status;
@@ -287,7 +291,7 @@ export class BoardPageComponent implements OnInit {
       event.currentIndex,
     );
 
-    this.packageService.movePackage(pkg.id, fromStatus, targetStatus).subscribe({
+    this.packageService.movePackage(pkg, targetStatus).subscribe({
       error: () => {
         // Store revert handles signal state; CDK list is refreshed via signal
       },

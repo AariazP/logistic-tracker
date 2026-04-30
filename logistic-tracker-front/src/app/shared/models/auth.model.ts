@@ -1,7 +1,6 @@
 export type UserRole = 'ADMIN' | 'DRIVER';
 
 export interface User {
-  id: string;
   username: string;
   role: UserRole;
 }
@@ -13,5 +12,5 @@ export interface AuthCredentials {
 
 export interface AuthResponse {
   token: string;
-  user: User;
+  role: UserRole;
 }

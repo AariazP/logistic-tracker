@@ -66,9 +66,10 @@ describe('PackageService', () => {
   });
 
   it('should reject invalid transition RECEIVED → DELIVERED', () => {
-    store.setPackages([mockPackage({ id: '1', status: 'RECEIVED' })]);
+    const pkg = mockPackage({ id: '1', trackingId: 'TRK-001', status: 'RECEIVED' });
+    store.setPackages([pkg]);
     let errorCaught = false;
-    service.movePackage('1', 'RECEIVED', 'DELIVERED').subscribe({
+    service.movePackage(pkg, 'DELIVERED').subscribe({
       error: (err: Error) => {
         expect(err.message).toContain('Invalid transition');
         errorCaught = true;
@@ -78,13 +79,14 @@ describe('PackageService', () => {
   });
 
   it('should optimistically update and revert on backend error', () => {
-    store.setPackages([mockPackage({ id: '1', status: 'RECEIVED' })]);
-    service.movePackage('1', 'RECEIVED', 'IN_TRANSIT').subscribe({ error: () => {} });
+    const pkg = mockPackage({ id: '1', trackingId: 'TRK-001', status: 'RECEIVED' });
+    store.setPackages([pkg]);
+    service.movePackage(pkg, 'IN_TRANSIT').subscribe({ error: () => {} });
 
     // Optimistic update applied
     expect(store.packages()[0].status).toBe('IN_TRANSIT');
 
-    const req = httpMock.expectOne((r) => r.url.includes('/packages/1/status'));
+    const req = httpMock.expectOne((r) => r.url.includes('/packages/TRK-001/status'));
     req.flush({ message: 'Error' }, { status: 400, statusText: 'Bad Request' });
 
     // Reverted
