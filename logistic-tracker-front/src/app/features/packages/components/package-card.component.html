@@ -1,0 +1,22 @@
+<div class="package-card" [class.is-draggable]="draggable()" [attr.aria-disabled]="!draggable()">
+  <div class="card-header">
+    <span class="tracking-id">{{ pkg().trackingId }}</span>
+    <span class="status-badge" [class]="'status-' + pkg().status.toLowerCase()">
+      {{ pkg().status }}
+    </span>
+  </div>
+  <div class="card-body">
+    <div class="info-row">
+      <span class="label">Recipient</span>
+      <span class="value">{{ pkg().recipientName }}</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Weight</span>
+      <span class="value">{{ pkg().weight }} kg</span>
+    </div>
+    <div class="info-row">
+      <span class="label">Dimensions</span>
+      <span class="value">{{ pkg().dimensions }}</span>
+    </div>
+  </div>
+</div>

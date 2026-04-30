@@ -1,0 +1,87 @@
+<section class="admin-grid">
+  <article class="panel">
+    <h3 class="panel-title">Recipients</h3>
+
+    <form [formGroup]="recipientForm" (ngSubmit)="saveRecipient()" class="stack">
+      <div class="fields-grid">
+        <label class="field">
+          <span>Name</span>
+          <input formControlName="name" type="text" />
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input formControlName="email" type="email" />
+        </label>
+        <label class="field">
+          <span>Phone</span>
+          <input formControlName="phone" type="text" />
+        </label>
+        <label class="field">
+          <span>Address</span>
+          <input formControlName="address" type="text" />
+        </label>
+        <label class="field">
+          <span>Document</span>
+          <input formControlName="documentNumber" type="text" />
+        </label>
+      </div>
+      <div class="row-actions">
+        <button type="submit" class="btn-primary" [disabled]="recipientSaving()">
+          {{ editingRecipientId() ? 'Update recipient' : 'Create recipient' }}
+        </button>
+        @if (editingRecipientId()) {
+          <button type="button" class="btn-ghost" (click)="cancelRecipientEdit()">Cancel edit</button>
+        }
+      </div>
+    </form>
+
+    <div class="list-wrap">
+      @for (recipient of recipients(); track recipient.id) {
+        <div class="list-item">
+          <div>
+            <strong>{{ recipient.name }}</strong>
+            <p>{{ recipient.email }} | {{ recipient.phone }}</p>
+          </div>
+          <div class="row-actions">
+            <button type="button" class="btn-ghost" (click)="editRecipient(recipient)">Edit</button>
+            <button type="button" class="btn-danger" (click)="deleteRecipient(recipient.id)">Delete</button>
+          </div>
+        </div>
+      }
+    </div>
+  </article>
+
+  <article class="panel">
+    <h3 class="panel-title">Drivers</h3>
+
+    <form [formGroup]="driverForm" (ngSubmit)="createDriver()" class="stack">
+      <div class="fields-grid two-col">
+        <label class="field">
+          <span>Username</span>
+          <input formControlName="username" type="text" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input formControlName="password" type="password" />
+        </label>
+      </div>
+      <button type="submit" class="btn-primary" [disabled]="driverSaving()">Create driver</button>
+    </form>
+
+    <div class="list-wrap">
+      @for (driver of drivers(); track driver.id) {
+        <div class="list-item">
+          <div>
+            <strong>{{ driver.username }}</strong>
+            <p>{{ driver.role }} | {{ driver.createdAt | date: 'short' }}</p>
+          </div>
+          <button type="button" class="btn-danger" (click)="deleteDriver(driver.id)">Delete</button>
+        </div>
+      }
+    </div>
+  </article>
+</section>
+
+@if (error()) {
+  <div class="global-error">{{ error() }}</div>
+}
