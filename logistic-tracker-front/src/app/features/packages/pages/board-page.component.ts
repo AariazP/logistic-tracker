@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
 import { BoardNavbarComponent } from '../components/organisms/board-navbar.component';
 import { PackageSearchFilterComponent } from '../components/molecules/package-search-filter.component';
 import { PackageBoardColumnsComponent } from '../components/organisms/package-board-columns.component';
-import { AdminManagementComponent } from '../components/organisms/admin-management.component';
 
 @Component({
   selector: 'app-board-page',
@@ -19,16 +18,19 @@ import { AdminManagementComponent } from '../components/organisms/admin-manageme
     PackageFormComponent,
     PackageSearchFilterComponent,
     PackageBoardColumnsComponent,
-    AdminManagementComponent,
   ],
   template: `
     <div class="board-layout">
-      <app-board-navbar [user]="authStore.user()" (logout)="logout()" />
+      <app-board-navbar
+        [user]="authStore.user()"
+        [showAdminButton]="authStore.isAdmin()"
+        (openAdmin)="goToAdminManagement()"
+        (logout)="logout()"
+      />
 
       <main class="board-content">
         @if (authStore.isAdmin()) {
           <app-package-form (packageCreated)="onPackageCreated()" />
-          <app-admin-management />
         }
 
         <app-package-search-filter
@@ -240,6 +242,10 @@ export class BoardPageComponent implements OnInit {
 
   clearError(): void {
     this.store.clearError();
+  }
+
+  goToAdminManagement(): void {
+    this.router.navigate(['/admin']);
   }
 
   logout(): void {

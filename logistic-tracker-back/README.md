@@ -11,8 +11,9 @@ Built with Java 21, Spring Boot 3.x, PostgreSQL, Docker, and JWT Authentication.
 2. [Setup & Running](#setup--running)
 3. [Environment Variables](#environment-variables)
 4. [API Documentation](#api-documentation)
-5. [Database Justification (PostgreSQL vs NoSQL)](#database-justification)
-6. [AI Skill Log](#ai-skill-log)
+5. [Database Design](#database-design)
+6. [Database Justification (PostgreSQL vs NoSQL)](#database-justification)
+7. [AI Skill Log](#ai-skill-log)
 
 ---
 
@@ -273,6 +274,14 @@ RECEIVED → IN_TRANSIT → DELIVERED
   "fieldErrors": null
 }
 ```
+
+---
+
+## Database Design
+
+The database entity-relationship design (ERD), table structure, and key constraints are documented here:
+
+- [`docs/database-design.md`](docs/database-design.md)
 
 ---
 
