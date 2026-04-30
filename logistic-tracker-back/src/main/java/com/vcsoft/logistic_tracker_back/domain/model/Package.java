@@ -3,6 +3,9 @@ package com.vcsoft.logistic_tracker_back.domain.model;
 import com.vcsoft.logistic_tracker_back.domain.state.PackageState;
 import com.vcsoft.logistic_tracker_back.domain.state.PackageStateFactory;
 import com.vcsoft.logistic_tracker_back.domain.state.ReceivedState;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -11,6 +14,8 @@ import java.util.UUID;
  * Pure domain aggregate root. No framework annotations — framework-agnostic
  * business model following Clean Architecture domain layer rules.
  */
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Package {
 
     private final UUID id;
@@ -19,6 +24,7 @@ public class Package {
     private String dimensions;
     private final UUID recipientId;
     private String recipientName;
+    @Getter(AccessLevel.NONE)
     private PackageState state;
     private final Instant createdAt;
     private Instant updatedAt;
@@ -43,20 +49,6 @@ public class Package {
                 PackageStateFactory.from(status), createdAt, updatedAt);
     }
 
-    private Package(UUID id, String trackingId, double weight, String dimensions,
-                    UUID recipientId, String recipientName, PackageState state,
-                    Instant createdAt, Instant updatedAt) {
-        this.id = id;
-        this.trackingId = trackingId;
-        this.weight = weight;
-        this.dimensions = dimensions;
-        this.recipientId = recipientId;
-        this.recipientName = recipientName;
-        this.state = state;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
     /**
      * Executes a state transition through the State pattern.
      * Business rule enforcement lives in the state classes — no if-else here.
@@ -66,15 +58,5 @@ public class Package {
         this.updatedAt = Instant.now();
     }
 
-    // ── Getters ───────────────────────────────────────────────────────────────
-
-    public UUID getId() { return id; }
-    public String getTrackingId() { return trackingId; }
-    public double getWeight() { return weight; }
-    public String getDimensions() { return dimensions; }
-    public UUID getRecipientId() { return recipientId; }
-    public String getRecipientName() { return recipientName; }
     public PackageStatus getStatus() { return state.getStatus(); }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
 }

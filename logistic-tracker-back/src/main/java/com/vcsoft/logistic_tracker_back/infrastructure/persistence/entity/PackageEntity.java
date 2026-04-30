@@ -2,6 +2,11 @@ package com.vcsoft.logistic_tracker_back.infrastructure.persistence.entity;
 
 import com.vcsoft.logistic_tracker_back.domain.model.PackageStatus;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -20,6 +25,9 @@ import java.util.UUID;
         @Index(name = "idx_packages_tracking_id", columnList = "tracking_id", unique = true)
     }
 )
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class PackageEntity {
 
     @Id
@@ -42,6 +50,7 @@ public class PackageEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
+    @Setter
     private PackageStatus status;
 
     @CreationTimestamp
@@ -50,34 +59,6 @@ public class PackageEntity {
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
+    @Setter
     private Instant updatedAt;
-
-    // ── JPA required no-arg constructor ──────────────────────────────────────
-    protected PackageEntity() {}
-
-    // ── Full constructor ──────────────────────────────────────────────────────
-    public PackageEntity(UUID id, String trackingId, double weight, String dimensions,
-                         RecipientEntity recipient, PackageStatus status,
-                         Instant createdAt, Instant updatedAt) {
-        this.id = id;
-        this.trackingId = trackingId;
-        this.weight = weight;
-        this.dimensions = dimensions;
-        this.recipient = recipient;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    // ── Getters / Setters ────────────────────────────────────────────────────
-    public UUID getId() { return id; }
-    public String getTrackingId() { return trackingId; }
-    public double getWeight() { return weight; }
-    public String getDimensions() { return dimensions; }
-    public RecipientEntity getRecipient() { return recipient; }
-    public PackageStatus getStatus() { return status; }
-    public void setStatus(PackageStatus status) { this.status = status; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 }

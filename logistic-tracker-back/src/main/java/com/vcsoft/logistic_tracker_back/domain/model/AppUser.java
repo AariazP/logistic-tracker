@@ -1,8 +1,14 @@
 package com.vcsoft.logistic_tracker_back.domain.model;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AppUser {
 
     private final UUID id;
@@ -20,17 +26,4 @@ public class AppUser {
         return new AppUser(id, username, passwordHash, role, createdAt);
     }
 
-    private AppUser(UUID id, String username, String passwordHash, UserRole role, Instant createdAt) {
-        this.id = id;
-        this.username = username;
-        this.passwordHash = passwordHash;
-        this.role = role;
-        this.createdAt = createdAt;
-    }
-
-    public UUID getId() { return id; }
-    public String getUsername() { return username; }
-    public String getPasswordHash() { return passwordHash; }
-    public UserRole getRole() { return role; }
-    public Instant getCreatedAt() { return createdAt; }
 }

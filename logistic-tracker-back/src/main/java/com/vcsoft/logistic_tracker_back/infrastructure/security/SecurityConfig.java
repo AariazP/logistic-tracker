@@ -2,6 +2,7 @@ package com.vcsoft.logistic_tracker_back.infrastructure.security;
 
 import com.vcsoft.logistic_tracker_back.infrastructure.security.JwtAuthenticationFilter;
 import com.vcsoft.logistic_tracker_back.infrastructure.security.SmartShipUserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Value("${app.cors.allowed-origins:http://localhost:4200}")
@@ -37,12 +39,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
     private final SmartShipUserDetailsService userDetailsService;
-
-    public SecurityConfig(JwtAuthenticationFilter jwtFilter,
-                          SmartShipUserDetailsService userDetailsService) {
-        this.jwtFilter = jwtFilter;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

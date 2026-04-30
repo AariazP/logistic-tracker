@@ -7,6 +7,7 @@ import com.vcsoft.logistic_tracker_back.application.dto.request.CreateDriverRequ
 import com.vcsoft.logistic_tracker_back.application.dto.response.DriverResponse;
 import com.vcsoft.logistic_tracker_back.adapter.mapper.DriverResponseMapper;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,22 +23,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/admin/drivers")
+@RequiredArgsConstructor
 public class DriverAdminController {
 
     private final CreateDriverUseCase createDriverUseCase;
     private final ListDriversUseCase listDriversUseCase;
     private final DeleteDriverUseCase deleteDriverUseCase;
     private final DriverResponseMapper driverResponseMapper;
-
-    public DriverAdminController(CreateDriverUseCase createDriverUseCase,
-                                 ListDriversUseCase listDriversUseCase,
-                                 DeleteDriverUseCase deleteDriverUseCase,
-                                 DriverResponseMapper driverResponseMapper) {
-        this.createDriverUseCase = createDriverUseCase;
-        this.listDriversUseCase = listDriversUseCase;
-        this.deleteDriverUseCase = deleteDriverUseCase;
-        this.driverResponseMapper = driverResponseMapper;
-    }
 
     @PostMapping
     public ResponseEntity<DriverResponse> createDriver(@Valid @RequestBody CreateDriverRequest request) {

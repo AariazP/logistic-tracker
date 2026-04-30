@@ -6,6 +6,7 @@ import com.vcsoft.logistic_tracker_back.domain.model.UserRole;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.entity.UserEntity;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.mapper.UserPersistenceMapper;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.repository.UserJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -13,16 +14,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class UserRepositoryAdapter implements UserRepository {
 
     private final UserJpaRepository userJpaRepository;
     private final UserPersistenceMapper mapper;
-
-    public UserRepositoryAdapter(UserJpaRepository userJpaRepository,
-                                 UserPersistenceMapper mapper) {
-        this.userJpaRepository = userJpaRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     public AppUser save(AppUser user) {

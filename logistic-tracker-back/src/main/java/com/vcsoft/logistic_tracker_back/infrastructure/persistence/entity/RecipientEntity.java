@@ -6,6 +6,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +18,9 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "recipients")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class RecipientEntity {
 
     @Id
@@ -43,28 +50,4 @@ public class RecipientEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    protected RecipientEntity() {
-    }
-
-    public RecipientEntity(UUID id, String name, String email, String phone,
-                           String address, String documentNumber,
-                           Instant createdAt, Instant updatedAt) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.phone = phone;
-        this.address = address;
-        this.documentNumber = documentNumber;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public UUID getId() { return id; }
-    public String getName() { return name; }
-    public String getEmail() { return email; }
-    public String getPhone() { return phone; }
-    public String getAddress() { return address; }
-    public String getDocumentNumber() { return documentNumber; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
 }
