@@ -9,6 +9,7 @@ import com.vcsoft.logistic_tracker_back.application.dto.request.UpdateRecipientR
 import com.vcsoft.logistic_tracker_back.application.dto.response.RecipientResponse;
 import com.vcsoft.logistic_tracker_back.adapter.mapper.RecipientResponseMapper;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +26,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/admin/recipients")
+@RequiredArgsConstructor
 public class RecipientAdminController {
 
     private final CreateRecipientUseCase createRecipientUseCase;
@@ -32,18 +34,6 @@ public class RecipientAdminController {
     private final UpdateRecipientUseCase updateRecipientUseCase;
     private final DeleteRecipientUseCase deleteRecipientUseCase;
     private final RecipientResponseMapper recipientResponseMapper;
-
-    public RecipientAdminController(CreateRecipientUseCase createRecipientUseCase,
-                                    ListRecipientsUseCase listRecipientsUseCase,
-                                    UpdateRecipientUseCase updateRecipientUseCase,
-                                    DeleteRecipientUseCase deleteRecipientUseCase,
-                                    RecipientResponseMapper recipientResponseMapper) {
-        this.createRecipientUseCase = createRecipientUseCase;
-        this.listRecipientsUseCase = listRecipientsUseCase;
-        this.updateRecipientUseCase = updateRecipientUseCase;
-        this.deleteRecipientUseCase = deleteRecipientUseCase;
-        this.recipientResponseMapper = recipientResponseMapper;
-    }
 
     @PostMapping
     public ResponseEntity<RecipientResponse> createRecipient(@Valid @RequestBody CreateRecipientRequest request) {

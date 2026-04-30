@@ -5,6 +5,7 @@ import com.vcsoft.logistic_tracker_back.domain.model.Recipient;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.entity.RecipientEntity;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.mapper.RecipientPersistenceMapper;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.repository.RecipientJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,16 +13,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@RequiredArgsConstructor
 public class RecipientRepositoryAdapter implements RecipientRepository {
 
     private final RecipientJpaRepository recipientJpaRepository;
     private final RecipientPersistenceMapper mapper;
-
-    public RecipientRepositoryAdapter(RecipientJpaRepository recipientJpaRepository,
-                                      RecipientPersistenceMapper mapper) {
-        this.recipientJpaRepository = recipientJpaRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     public Recipient save(Recipient recipient) {

@@ -1,11 +1,19 @@
 package com.vcsoft.logistic_tracker_back.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class UserEntity {
 
     @Id
@@ -24,19 +32,4 @@ public class UserEntity {
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
-    protected UserEntity() {}
-
-    public UserEntity(UUID id, String username, String password, String role, Instant createdAt) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.role = role;
-        this.createdAt = createdAt;
-    }
-
-    public UUID getId() { return id; }
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public String getRole() { return role; }
-    public Instant getCreatedAt() { return createdAt; }
 }

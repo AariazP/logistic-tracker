@@ -10,6 +10,7 @@ import com.vcsoft.logistic_tracker_back.application.dto.request.UpdatePackageSta
 import com.vcsoft.logistic_tracker_back.application.dto.response.PackageResponse;
 import com.vcsoft.logistic_tracker_back.adapter.mapper.PackageResponseMapper;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/packages")
+@RequiredArgsConstructor
 public class PackageController {
 
     private final CreatePackageUseCase createPackageUseCase;
@@ -29,18 +31,6 @@ public class PackageController {
     private final GetPackageByTrackingIdUseCase getPackageByTrackingIdUseCase;
     private final UpdatePackageStatusUseCase updatePackageStatusUseCase;
     private final PackageResponseMapper responseMapper;
-
-    public PackageController(CreatePackageUseCase createPackageUseCase,
-                             ListPackagesUseCase listPackagesUseCase,
-                             GetPackageByTrackingIdUseCase getPackageByTrackingIdUseCase,
-                             UpdatePackageStatusUseCase updatePackageStatusUseCase,
-                             PackageResponseMapper responseMapper) {
-        this.createPackageUseCase = createPackageUseCase;
-        this.listPackagesUseCase = listPackagesUseCase;
-        this.getPackageByTrackingIdUseCase = getPackageByTrackingIdUseCase;
-        this.updatePackageStatusUseCase = updatePackageStatusUseCase;
-        this.responseMapper = responseMapper;
-    }
 
     /**
      * POST /api/v1/packages — ADMIN only (enforced in SecurityConfig)

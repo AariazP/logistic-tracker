@@ -7,6 +7,7 @@ import com.vcsoft.logistic_tracker_back.infrastructure.persistence.entity.Packag
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.mapper.PackagePersistenceMapper;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.repository.PackageJpaRepository;
 import com.vcsoft.logistic_tracker_back.infrastructure.persistence.repository.RecipientJpaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,19 +19,12 @@ import java.util.UUID;
  * Translates between domain model and JPA entity.
  */
 @Component
+@RequiredArgsConstructor
 public class PackageRepositoryAdapter implements PackageRepository {
 
     private final PackageJpaRepository jpaRepository;
     private final RecipientJpaRepository recipientJpaRepository;
     private final PackagePersistenceMapper mapper;
-
-    public PackageRepositoryAdapter(PackageJpaRepository jpaRepository,
-                                    RecipientJpaRepository recipientJpaRepository,
-                                    PackagePersistenceMapper mapper) {
-        this.jpaRepository = jpaRepository;
-        this.recipientJpaRepository = recipientJpaRepository;
-        this.mapper = mapper;
-    }
 
     @Override
     public Package save(Package pkg) {
