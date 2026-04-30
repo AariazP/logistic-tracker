@@ -9,6 +9,7 @@ const mockPackage: Package = {
   trackingId: 'TRK-001',
   weight: 2.5,
   dimensions: '30x20x10',
+  recipientId: 'recipient-1',
   recipientName: 'Alice Smith',
   status: 'RECEIVED',
   createdAt: '2024-01-01T00:00:00Z',

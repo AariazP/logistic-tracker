@@ -9,10 +9,10 @@ export class PackageService {
   private readonly api = inject(PackageApiService);
   private readonly store = inject(PackageStore);
 
-  loadPackages(): Observable<Package[]> {
+  loadPackages(status?: PackageStatus): Observable<Package[]> {
     this.store.setLoading(true);
     this.store.clearError();
-    return this.api.getAll().pipe(
+    return this.api.getAll(status).pipe(
       tap((packages) => {
         this.store.setPackages(packages);
         this.store.setLoading(false);
@@ -20,6 +20,16 @@ export class PackageService {
       catchError((err) => {
         this.store.setLoading(false);
         this.store.setError(getApiErrorMessage(err, 'Failed to load packages'));
+        return throwError(() => err);
+      }),
+    );
+  }
+
+  getPackageByTrackingId(trackingId: string): Observable<Package> {
+    this.store.clearError();
+    return this.api.getByTrackingId(trackingId).pipe(
+      catchError((err) => {
+        this.store.setError(getApiErrorMessage(err, 'Failed to fetch package detail'));
         return throwError(() => err);
       }),
     );

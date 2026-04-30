@@ -17,6 +17,7 @@ public class Package {
     private final String trackingId;
     private double weight;
     private String dimensions;
+    private final UUID recipientId;
     private String recipientName;
     private PackageState state;
     private final Instant createdAt;
@@ -25,28 +26,31 @@ public class Package {
     /**
      * Factory method: creates a new package in RECEIVED state.
      */
-    public static Package create(String trackingId, double weight, String dimensions, String recipientName) {
+    public static Package create(String trackingId, double weight, String dimensions,
+                                 UUID recipientId, String recipientName) {
         UUID id = UUID.randomUUID();
         Instant now = Instant.now();
-        return new Package(id, trackingId, weight, dimensions, recipientName, new ReceivedState(), now, now);
+        return new Package(id, trackingId, weight, dimensions, recipientId, recipientName, new ReceivedState(), now, now);
     }
 
     /**
      * Reconstitution constructor: restores a package from persistence.
      */
     public static Package reconstitute(UUID id, String trackingId, double weight,
-                                       String dimensions, String recipientName,
+                                       String dimensions, UUID recipientId, String recipientName,
                                        PackageStatus status, Instant createdAt, Instant updatedAt) {
-        return new Package(id, trackingId, weight, dimensions, recipientName,
+        return new Package(id, trackingId, weight, dimensions, recipientId, recipientName,
                 PackageStateFactory.from(status), createdAt, updatedAt);
     }
 
     private Package(UUID id, String trackingId, double weight, String dimensions,
-                    String recipientName, PackageState state, Instant createdAt, Instant updatedAt) {
+                    UUID recipientId, String recipientName, PackageState state,
+                    Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.trackingId = trackingId;
         this.weight = weight;
         this.dimensions = dimensions;
+        this.recipientId = recipientId;
         this.recipientName = recipientName;
         this.state = state;
         this.createdAt = createdAt;
@@ -68,6 +72,7 @@ public class Package {
     public String getTrackingId() { return trackingId; }
     public double getWeight() { return weight; }
     public String getDimensions() { return dimensions; }
+    public UUID getRecipientId() { return recipientId; }
     public String getRecipientName() { return recipientName; }
     public PackageStatus getStatus() { return state.getStatus(); }
     public Instant getCreatedAt() { return createdAt; }

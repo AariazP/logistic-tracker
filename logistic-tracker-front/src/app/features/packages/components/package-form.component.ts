@@ -1,7 +1,8 @@
-import { Component, inject, signal, output } from '@angular/core';
+import { Component, OnInit, inject, signal, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { PackageService } from '../../../core/services/package.service';
-import { CreatePackageRequest, getApiErrorMessage } from '../../../shared/models';
+import { AdminApiService } from '../../../core/services/admin-api.service';
+import { CreatePackageRequest, Recipient, getApiErrorMessage } from '../../../shared/models';
 
 @Component({
   selector: 'app-package-form',
@@ -56,16 +57,16 @@ import { CreatePackageRequest, getApiErrorMessage } from '../../../shared/models
           </div>
 
           <div class="field">
-            <label for="recipientName">Recipient Name</label>
-            <input
-              id="recipientName"
-              type="text"
-              formControlName="recipientName"
-              placeholder="Full name"
-              [class.invalid]="isInvalid('recipientName')"
-            />
-            @if (isInvalid('recipientName')) {
-              <span class="field-error">Recipient name is required</span>
+            <label for="recipientId">Recipient</label>
+            <select id="recipientId" formControlName="recipientId" [class.invalid]="isInvalid('recipientId')">
+              <option value="">Select recipient</option>
+              @for (recipient of recipients(); track recipient.id) {
+                <option [value]="recipient.id">{{ recipient.name }} - {{ recipient.documentNumber }}</option>
+              }
+            </select>
+            <button type="button" class="btn-link" (click)="loadRecipients()">Refresh recipients</button>
+            @if (isInvalid('recipientId')) {
+              <span class="field-error">Recipient is required</span>
             }
           </div>
         </div>
@@ -129,9 +130,30 @@ import { CreatePackageRequest, getApiErrorMessage } from '../../../shared/models
       outline: none;
       transition: border-color 0.2s;
     }
+    .field select {
+      padding: 0.55rem 0.75rem;
+      border: 1.5px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+      background: white;
+    }
     .field input:focus { border-color: #4f46e5; }
+    .field select:focus { border-color: #4f46e5; }
     .field input.invalid { border-color: #ef4444; }
+    .field select.invalid { border-color: #ef4444; }
     .field-error { font-size: 0.75rem; color: #ef4444; }
+    .btn-link {
+      border: none;
+      background: transparent;
+      color: #4f46e5;
+      padding: 0;
+      text-align: left;
+      font-size: 0.78rem;
+      cursor: pointer;
+      width: fit-content;
+    }
     .error-banner {
       background: #fef2f2;
       border: 1px solid #fecaca;
@@ -164,22 +186,35 @@ import { CreatePackageRequest, getApiErrorMessage } from '../../../shared/models
     .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
   `],
 })
-export class PackageFormComponent {
+export class PackageFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly packageService = inject(PackageService);
+  private readonly adminApi = inject(AdminApiService);
 
   readonly packageCreated = output<void>();
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly success = signal(false);
+  readonly recipients = signal<Recipient[]>([]);
 
   readonly form = this.fb.group({
     trackingId: ['', [Validators.required, Validators.maxLength(100)]],
     weight: [null as number | null, [Validators.required, Validators.min(0.01)]],
     dimensions: ['', [Validators.required, Validators.maxLength(255)]],
-    recipientName: ['', [Validators.required, Validators.maxLength(255)]],
+    recipientId: ['', [Validators.required]],
   });
+
+  ngOnInit(): void {
+    this.loadRecipients();
+  }
+
+  loadRecipients(): void {
+    this.adminApi.getRecipients().subscribe({
+      next: (items) => this.recipients.set(items),
+      error: (err: unknown) => this.error.set(getApiErrorMessage(err, 'Failed to load recipients')),
+    });
+  }
 
   isInvalid(field: string): boolean {
     const c = this.form.get(field);
