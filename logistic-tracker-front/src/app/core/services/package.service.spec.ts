@@ -11,6 +11,7 @@ const mockPackage = (overrides: Partial<Package> = {}): Package => ({
   trackingId: 'TRK-001',
   weight: 2.5,
   dimensions: '30x20x10',
+  recipientId: 'recipient-1',
   recipientName: 'Alice',
   status: 'RECEIVED',
   createdAt: '2024-01-01T00:00:00Z',
@@ -57,7 +58,7 @@ describe('PackageService', () => {
 
   it('should add package to store on create', () => {
     const newPkg = mockPackage({ id: '99' });
-    service.createPackage({ trackingId: 'TRK-099', weight: 1, dimensions: '10x10x10', recipientName: 'Bob' }).subscribe();
+    service.createPackage({ trackingId: 'TRK-099', weight: 1, dimensions: '10x10x10', recipientId: 'recipient-99' }).subscribe();
 
     const req = httpMock.expectOne((r) => r.url.includes('/packages'));
     req.flush(newPkg);

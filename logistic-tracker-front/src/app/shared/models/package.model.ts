@@ -5,6 +5,7 @@ export interface Package {
   trackingId: string;
   weight: number;
   dimensions: string;
+  recipientId: string;
   recipientName: string;
   status: PackageStatus;
   createdAt: string;
@@ -15,7 +16,7 @@ export interface CreatePackageRequest {
   trackingId: string;
   weight: number;
   dimensions: string;
-  recipientName: string;
+  recipientId: string;
 }
 
 export interface UpdatePackageStatusRequest {
