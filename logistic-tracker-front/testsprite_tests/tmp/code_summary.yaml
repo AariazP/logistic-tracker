@@ -1,0 +1,132 @@
+version: "2"
+type: frontend
+tech_stack:
+  - TypeScript
+  - Angular 21
+  - Angular CDK Drag and Drop
+  - Angular Signals + RxJS + Reactive Forms
+routes:
+  - path: /login
+    file: src/app/features/auth/pages/login-page.component.ts
+    auth_required: false
+    description: User login page with username and password form
+  - path: /board
+    file: src/app/features/packages/pages/board-page.component.ts
+    auth_required: true
+    description: Logistics package board with status columns and drag-and-drop updates
+  - path: /admin
+    file: src/app/features/packages/pages/admin-page.component.ts
+    auth_required: true
+    description: Admin management area for recipients and drivers
+features:
+  - name: User Login
+    description: Authenticate user with username and password and persist JWT session
+    files:
+      - src/app/features/auth/pages/login-page.component.ts
+      - src/app/core/services/auth.service.ts
+      - src/app/core/services/auth.store.ts
+      - src/app/core/interceptors/jwt.interceptor.ts
+    entry_route: /login
+    user_interactions:
+      - Fill username input
+      - Fill password input
+      - Click login submit button
+      - View validation or invalid credential error messages
+      - Redirect to board on successful login
+    api_calls:
+      - method: POST
+        endpoint: /api/v1/auth/login
+    auth_required: false
+  - name: Package Board Monitoring
+    description: View packages grouped by status and optionally filter/search packages
+    files:
+      - src/app/features/packages/pages/board-page.component.ts
+      - src/app/features/packages/store/package.store.ts
+      - src/app/core/services/package.service.ts
+      - src/app/core/services/package-api.service.ts
+    entry_route: /board
+    user_interactions:
+      - Open board after authentication
+      - See packages grouped in RECEIVED, IN_TRANSIT and DELIVERED columns
+      - Filter packages by selected status
+      - Search package by tracking ID
+      - Clear filters/search and reload board data
+    api_calls:
+      - method: GET
+        endpoint: /api/v1/packages
+      - method: GET
+        endpoint: /api/v1/packages/{trackingId}
+    auth_required: true
+  - name: Package Status Transition
+    description: Move package status through drag-and-drop with optimistic UI and rollback on failure
+    files:
+      - src/app/features/packages/pages/board-page.component.ts
+      - src/app/core/services/package.service.ts
+      - src/app/core/services/package-api.service.ts
+      - src/app/shared/models/package.model.ts
+    entry_route: /board
+    user_interactions:
+      - Drag a package card from one status column to another
+      - Drop into a valid target status column
+      - Receive immediate UI update when move is attempted
+      - See error when transition is invalid or backend update fails
+      - Observe package return to previous status when backend rejects update
+    api_calls:
+      - method: PATCH
+        endpoint: /api/v1/packages/{trackingId}/status
+    auth_required: true
+  - name: Package Creation
+    description: Create new package records from board form using recipient selection
+    files:
+      - src/app/features/packages/components/package-form.component.ts
+      - src/app/core/services/package.service.ts
+      - src/app/core/services/package-api.service.ts
+      - src/app/core/services/admin-api.service.ts
+    entry_route: /board
+    user_interactions:
+      - Open package creation form
+      - Fill tracking ID, weight, dimensions and recipient
+      - Submit form to create package
+      - See success or error feedback
+    api_calls:
+      - method: GET
+        endpoint: /api/v1/admin/recipients
+      - method: POST
+        endpoint: /api/v1/packages
+    auth_required: true
+  - name: Admin Recipient and Driver Management
+    description: Manage recipients and drivers from admin page
+    files:
+      - src/app/features/packages/pages/admin-page.component.ts
+      - src/app/features/packages/components/organisms/admin-management.component.ts
+      - src/app/core/services/admin-api.service.ts
+    entry_route: /admin
+    user_interactions:
+      - Open admin page as ADMIN user
+      - Create and edit recipient data
+      - Delete recipient records
+      - Create driver accounts
+      - Delete drivers
+    api_calls:
+      - method: GET
+        endpoint: /api/v1/admin/recipients
+      - method: POST
+        endpoint: /api/v1/admin/recipients
+      - method: PUT
+        endpoint: /api/v1/admin/recipients/{recipientId}
+      - method: DELETE
+        endpoint: /api/v1/admin/recipients/{recipientId}
+      - method: GET
+        endpoint: /api/v1/admin/drivers
+      - method: POST
+        endpoint: /api/v1/admin/drivers
+      - method: DELETE
+        endpoint: /api/v1/admin/drivers/{driverId}
+    auth_required: true
+known_limitations:
+  - issue: Application depends on backend API availability and does not include offline/mock fallback by default
+    location: src/environments/environment.ts
+    impact: End-to-end UI flows fail when API is unavailable or endpoint base URL is misconfigured
+  - issue: Board route is default redirect target even for unauthenticated users, relying on guard redirects
+    location: src/app/app.routes.ts
+    impact: Initial navigation causes extra redirect hop before reaching login page
