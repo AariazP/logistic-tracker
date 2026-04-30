@@ -13,6 +13,7 @@ public record PackageResponse(
         String trackingId,
         double weight,
         String dimensions,
+        UUID recipientId,
         String recipientName,
         PackageStatus status,
         Instant createdAt,

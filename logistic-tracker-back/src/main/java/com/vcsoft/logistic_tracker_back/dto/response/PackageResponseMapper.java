@@ -16,6 +16,7 @@ public class PackageResponseMapper {
                 pkg.getTrackingId(),
                 pkg.getWeight(),
                 pkg.getDimensions(),
+                pkg.getRecipientId(),
                 pkg.getRecipientName(),
                 pkg.getStatus(),
                 pkg.getCreatedAt(),

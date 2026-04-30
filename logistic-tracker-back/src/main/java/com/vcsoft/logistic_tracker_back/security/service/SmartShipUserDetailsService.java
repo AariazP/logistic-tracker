@@ -1,6 +1,6 @@
 package com.vcsoft.logistic_tracker_back.security.service;
 
-import com.vcsoft.logistic_tracker_back.infrastructure.persistence.repository.UserJpaRepository;
+import com.vcsoft.logistic_tracker_back.application.port.output.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,19 +13,19 @@ import java.util.List;
 @Service
 public class SmartShipUserDetailsService implements UserDetailsService {
 
-    private final UserJpaRepository userJpaRepository;
+    private final UserRepository userRepository;
 
-    public SmartShipUserDetailsService(UserJpaRepository userJpaRepository) {
-        this.userJpaRepository = userJpaRepository;
+    public SmartShipUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userJpaRepository.findByUsername(username)
-                .map(entity -> new User(
-                        entity.getUsername(),
-                        entity.getPassword(),
-                        List.of(new SimpleGrantedAuthority("ROLE_" + entity.getRole()))
+        return userRepository.findByUsername(username)
+                .map(user -> new User(
+                        user.getUsername(),
+                        user.getPasswordHash(),
+                        List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
                 ))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }

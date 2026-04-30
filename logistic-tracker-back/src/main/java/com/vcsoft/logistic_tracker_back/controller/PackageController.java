@@ -1,6 +1,9 @@
 package com.vcsoft.logistic_tracker_back.controller;
 
-import com.vcsoft.logistic_tracker_back.application.port.input.PackageUseCase;
+import com.vcsoft.logistic_tracker_back.application.port.input.CreatePackageUseCase;
+import com.vcsoft.logistic_tracker_back.application.port.input.GetPackageByTrackingIdUseCase;
+import com.vcsoft.logistic_tracker_back.application.port.input.ListPackagesUseCase;
+import com.vcsoft.logistic_tracker_back.application.port.input.UpdatePackageStatusUseCase;
 import com.vcsoft.logistic_tracker_back.domain.model.PackageStatus;
 import com.vcsoft.logistic_tracker_back.dto.request.CreatePackageRequest;
 import com.vcsoft.logistic_tracker_back.dto.request.UpdatePackageStatusRequest;
@@ -21,12 +24,21 @@ import java.util.List;
 @RequestMapping("/api/v1/packages")
 public class PackageController {
 
-    private final PackageUseCase packageUseCase;
+    private final CreatePackageUseCase createPackageUseCase;
+    private final ListPackagesUseCase listPackagesUseCase;
+    private final GetPackageByTrackingIdUseCase getPackageByTrackingIdUseCase;
+    private final UpdatePackageStatusUseCase updatePackageStatusUseCase;
     private final PackageResponseMapper responseMapper;
 
-    public PackageController(PackageUseCase packageUseCase,
+    public PackageController(CreatePackageUseCase createPackageUseCase,
+                             ListPackagesUseCase listPackagesUseCase,
+                             GetPackageByTrackingIdUseCase getPackageByTrackingIdUseCase,
+                             UpdatePackageStatusUseCase updatePackageStatusUseCase,
                              PackageResponseMapper responseMapper) {
-        this.packageUseCase = packageUseCase;
+        this.createPackageUseCase = createPackageUseCase;
+        this.listPackagesUseCase = listPackagesUseCase;
+        this.getPackageByTrackingIdUseCase = getPackageByTrackingIdUseCase;
+        this.updatePackageStatusUseCase = updatePackageStatusUseCase;
         this.responseMapper = responseMapper;
     }
 
@@ -36,11 +48,11 @@ public class PackageController {
     @PostMapping
     public ResponseEntity<PackageResponse> createPackage(
             @Valid @RequestBody CreatePackageRequest request) {
-        var pkg = packageUseCase.createPackage(
+        var pkg = createPackageUseCase.createPackage(
                 request.trackingId(),
                 request.weight(),
                 request.dimensions(),
-                request.recipientName()
+            request.recipientId()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(responseMapper.toResponse(pkg));
     }
@@ -51,7 +63,7 @@ public class PackageController {
     @GetMapping
     public ResponseEntity<List<PackageResponse>> listPackages(
             @RequestParam(required = false) PackageStatus status) {
-        List<PackageResponse> packages = packageUseCase.listPackages(status)
+        List<PackageResponse> packages = listPackagesUseCase.listPackages(status)
                 .stream()
                 .map(responseMapper::toResponse)
                 .toList();
@@ -63,12 +75,9 @@ public class PackageController {
      */
     @GetMapping("/{trackingId}")
     public ResponseEntity<PackageResponse> getByTrackingId(@PathVariable String trackingId) {
-        return packageUseCase.listPackages(null)
-                .stream()
-                .filter(p -> p.getTrackingId().equals(trackingId))
-                .findFirst()
-                .map(p -> ResponseEntity.ok(responseMapper.toResponse(p)))
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok(responseMapper.toResponse(
+            getPackageByTrackingIdUseCase.getByTrackingId(trackingId)
+        ));
     }
 
     /**
@@ -78,7 +87,7 @@ public class PackageController {
     public ResponseEntity<PackageResponse> updateStatus(
             @PathVariable String trackingId,
             @Valid @RequestBody UpdatePackageStatusRequest request) {
-        var pkg = packageUseCase.updateStatus(trackingId, request.status());
+        var pkg = updatePackageStatusUseCase.updateStatus(trackingId, request.status());
         return ResponseEntity.ok(responseMapper.toResponse(pkg));
     }
 }

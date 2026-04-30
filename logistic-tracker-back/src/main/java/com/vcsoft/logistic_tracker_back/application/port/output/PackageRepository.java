@@ -5,6 +5,7 @@ import com.vcsoft.logistic_tracker_back.domain.model.PackageStatus;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Output port: the use-case layer depends on this interface.
@@ -17,6 +18,8 @@ public interface PackageRepository {
     Optional<Package> findByTrackingId(String trackingId);
 
     boolean existsByTrackingId(String trackingId);
+
+    boolean existsActiveByRecipientId(UUID recipientId);
 
     List<Package> findAll();
 

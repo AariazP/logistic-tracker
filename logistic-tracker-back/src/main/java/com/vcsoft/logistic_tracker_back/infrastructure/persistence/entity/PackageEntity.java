@@ -36,8 +36,9 @@ public class PackageEntity {
     @Column(nullable = false, length = 255)
     private String dimensions;
 
-    @Column(name = "recipient_name", nullable = false, length = 255)
-    private String recipientName;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "recipient_id", nullable = false)
+    private RecipientEntity recipient;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -56,13 +57,13 @@ public class PackageEntity {
 
     // ── Full constructor ──────────────────────────────────────────────────────
     public PackageEntity(UUID id, String trackingId, double weight, String dimensions,
-                         String recipientName, PackageStatus status,
+                         RecipientEntity recipient, PackageStatus status,
                          Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.trackingId = trackingId;
         this.weight = weight;
         this.dimensions = dimensions;
-        this.recipientName = recipientName;
+        this.recipient = recipient;
         this.status = status;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -73,7 +74,7 @@ public class PackageEntity {
     public String getTrackingId() { return trackingId; }
     public double getWeight() { return weight; }
     public String getDimensions() { return dimensions; }
-    public String getRecipientName() { return recipientName; }
+    public RecipientEntity getRecipient() { return recipient; }
     public PackageStatus getStatus() { return status; }
     public void setStatus(PackageStatus status) { this.status = status; }
     public Instant getCreatedAt() { return createdAt; }

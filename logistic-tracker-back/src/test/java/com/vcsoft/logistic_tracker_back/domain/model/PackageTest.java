@@ -9,8 +9,10 @@ import static org.assertj.core.api.Assertions.*;
 @DisplayName("Package Domain Tests")
 class PackageTest {
 
+    private static final java.util.UUID RECIPIENT_ID = java.util.UUID.randomUUID();
+
     private Package newPackage() {
-        return Package.create("TRK-001", 2.5, "30x20x10", "John Doe");
+        return Package.create("TRK-001", 2.5, "30x20x10", RECIPIENT_ID, "John Doe");
     }
 
     // ── Creation ──────────────────────────────────────────────────────────────
@@ -109,7 +111,7 @@ class PackageTest {
     void shouldReconstituteInTransitAndAllowDelivered() {
         Package pkg = Package.reconstitute(
                 java.util.UUID.randomUUID(), "TRK-002", 1.0,
-                "10x10x10", "Jane Doe",
+            "10x10x10", RECIPIENT_ID, "Jane Doe",
                 PackageStatus.IN_TRANSIT,
                 java.time.Instant.now(), java.time.Instant.now()
         );

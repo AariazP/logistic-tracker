@@ -2,6 +2,9 @@ package com.vcsoft.logistic_tracker_back.exception;
 
 import com.vcsoft.logistic_tracker_back.domain.exception.InvalidStateTransitionException;
 import com.vcsoft.logistic_tracker_back.domain.exception.PackageNotFoundException;
+import com.vcsoft.logistic_tracker_back.domain.exception.RecipientDeletionNotAllowedException;
+import com.vcsoft.logistic_tracker_back.domain.exception.RecipientNotFoundException;
+import com.vcsoft.logistic_tracker_back.domain.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -30,12 +33,26 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
     }
 
+        @ExceptionHandler({RecipientNotFoundException.class, UserNotFoundException.class})
+        public ResponseEntity<ErrorResponse> handleResourceNotFound(RuntimeException ex) {
+                log.warn("Resource not found: {}", ex.getMessage());
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(ErrorResponse.of(404, "Not Found", ex.getMessage()));
+        }
+
     @ExceptionHandler(InvalidStateTransitionException.class)
     public ResponseEntity<ErrorResponse> handleInvalidTransition(InvalidStateTransitionException ex) {
         log.warn("Invalid state transition: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
     }
+
+        @ExceptionHandler(RecipientDeletionNotAllowedException.class)
+        public ResponseEntity<ErrorResponse> handleRecipientDeletionBlocked(RecipientDeletionNotAllowedException ex) {
+                log.warn("Recipient deletion blocked: {}", ex.getMessage());
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(ErrorResponse.of(409, "Conflict", ex.getMessage()));
+        }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {

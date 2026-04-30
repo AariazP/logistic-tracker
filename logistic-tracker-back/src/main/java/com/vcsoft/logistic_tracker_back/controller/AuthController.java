@@ -2,7 +2,6 @@ package com.vcsoft.logistic_tracker_back.controller;
 
 import com.vcsoft.logistic_tracker_back.dto.request.LoginRequest;
 import com.vcsoft.logistic_tracker_back.dto.response.LoginResponse;
-import com.vcsoft.logistic_tracker_back.infrastructure.persistence.repository.UserJpaRepository;
 import com.vcsoft.logistic_tracker_back.security.util.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -18,14 +17,11 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final UserJpaRepository userJpaRepository;
 
     public AuthController(AuthenticationManager authenticationManager,
-                          JwtUtil jwtUtil,
-                          UserJpaRepository userJpaRepository) {
+                          JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
-        this.userJpaRepository = userJpaRepository;
     }
 
     @PostMapping("/login")

@@ -54,7 +54,8 @@ public class SecurityConfig {
                         // Public endpoints
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
-                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         // ADMIN: create packages
                         .requestMatchers(HttpMethod.POST, "/api/v1/packages").hasRole("ADMIN")
                         // Both ADMIN and DRIVER can list / filter

@@ -14,5 +14,7 @@ public interface PackageJpaRepository extends JpaRepository<PackageEntity, UUID>
 
     boolean existsByTrackingId(String trackingId);
 
+    boolean existsByRecipient_IdAndStatusNot(UUID recipientId, PackageStatus status);
+
     List<PackageEntity> findAllByStatus(PackageStatus status);
 }
